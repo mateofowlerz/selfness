@@ -78,6 +78,17 @@ export default function Home() {
 					</Link>
 				))}
 			</Section>
+			<Section>
+				<Link
+					href="/products"
+					className="flex justify-between items-center"
+				>
+					<span className="font-semibold md:hover:text-primary-dark transition-colors">
+						Things I Love
+					</span>
+					<span className="text-(--muted)">→</span>
+				</Link>
+			</Section>
 		</main>
 	);
 }
