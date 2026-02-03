@@ -1,5 +1,8 @@
 # Project Instructions
 
+## Package Manager
+- Use pnpm for all package management commands
+
 ## Styling
 - For all files in `site/` workspace, use Tailwind CSS for styling
 - Use Tailwind utility classes directly in className attributes

@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Wishlist",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["id", "title", "url", "image"],
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "Stable unique identifier."
+      },
+      "title": {
+        "type": "string",
+        "description": "Display name for the item."
+      },
+      "brand": {
+        "type": "string",
+        "description": "Brand or maker."
+      },
+      "category": {
+        "type": "string",
+        "description": "Short category label."
+      },
+      "price": {
+        "type": "string",
+        "description": "Price or short label (e.g. $180, Wish)."
+      },
+      "note": {
+        "type": "string",
+        "description": "Optional short note shown under the title."
+      },
+      "badge": {
+        "type": "string",
+        "description": "Short badge text (e.g. Rare, Limited)."
+      },
+      "url": {
+        "type": "string",
+        "format": "uri",
+        "description": "External link opened on click."
+      },
+      "image": {
+        "type": "string",
+        "description": "Path in /public or a full URL (configure remote images if needed)."
+      },
+      "addedAt": {
+        "type": "string",
+        "format": "date-time",
+        "description": "Optional ISO date for sorting." 
+      }
+    }
+  }
+}

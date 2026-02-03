@@ -10,32 +10,32 @@
 }
 
 @font-face {
-  font-family: 'Public Sans';
-  src: url('/fonts/PublicSans[wght].ttf') format('truetype');
+  font-family: "Public Sans";
+  src: url("/fonts/PublicSans[wght].ttf") format("truetype");
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Public Sans';
-  src: url('/fonts/PublicSans-Italic[wght].ttf') format('truetype');
+  font-family: "Public Sans";
+  src: url("/fonts/PublicSans-Italic[wght].ttf") format("truetype");
   font-weight: 100 900;
   font-style: italic;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Libre Franklin';
-  src: url('/fonts/LibreFranklin[wght].ttf') format('truetype');
+  font-family: "Libre Franklin";
+  src: url("/fonts/LibreFranklin[wght].ttf") format("truetype");
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Libre Franklin';
-  src: url('/fonts/LibreFranklin-Italic[wght].ttf') format('truetype');
+  font-family: "Libre Franklin";
+  src: url("/fonts/LibreFranklin-Italic[wght].ttf") format("truetype");
   font-weight: 100 900;
   font-style: italic;
   font-display: swap;
@@ -53,7 +53,7 @@
 body {
   background: var(--bg);
   color: var(--fg);
-  font-family: 'Public Sans', system-ui, sans-serif;
+  font-family: "Public Sans", system-ui, sans-serif;
   line-height: 1.7;
   /* text-align: justify; */
 }
@@ -75,7 +75,6 @@ h2 {
   margin-bottom: 1rem;
   letter-spacing: -0.02em;
 }
-
 
 /* Small thumbnail container */
 .backlink-thumb {
@@ -128,7 +127,7 @@ h2 {
   max-height: 70vh;
   object-fit: contain;
   border-radius: 8px;
-  box-shadow: 
+  box-shadow:
     0 12px 48px rgba(0, 0, 0, 0.15),
     0 0 0 1px rgba(0, 0, 0, 0.05);
 }
@@ -145,7 +144,7 @@ h2 {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.10);
+  background: rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -165,7 +164,6 @@ h2 {
     padding: 2rem;
   }
 }
-
 
 .modal-content {
   max-width: 100%;
@@ -197,7 +195,7 @@ h2 {
 
 .modal-image-title {
   margin-top: 0.5rem;
-  font-family: 'Libre Franklin', system-ui, sans-serif;
+  font-family: "Libre Franklin", system-ui, sans-serif;
   font-size: 0.9rem;
   color: white;
   font-style: italic;

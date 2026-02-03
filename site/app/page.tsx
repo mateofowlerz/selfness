@@ -1,7 +1,6 @@
-import fs from "fs";
+import fs from "node:fs";
+import path from "node:path";
 import Link from "next/link";
-import path from "path";
-import TextWithImage from "./components/TextWithImage";
 
 const Section = ({ children }: { children: React.ReactNode }) => {
 	return (
@@ -60,7 +59,8 @@ export default function Home() {
 					>
 						Melian
 					</a>
-					, a company that's building the best shopping experience ever made.
+					, a company that&apos;s building the best shopping experience ever
+					made.
 				</p>
 			</Section>
 			<Section>
@@ -79,12 +79,9 @@ export default function Home() {
 				))}
 			</Section>
 			<Section>
-				<Link
-					href="/products"
-					className="flex justify-between items-center"
-				>
+				<Link href="/products" className="flex justify-between items-center">
 					<span className="font-semibold md:hover:text-primary-dark transition-colors">
-						Things I Love
+						Wishlist
 					</span>
 					<span className="text-(--muted)">→</span>
 				</Link>

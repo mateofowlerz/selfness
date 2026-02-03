@@ -1,0 +1,42 @@
+[
+  {
+    "id": "lego-porsche-911",
+    "title": "Porsche 911 10295",
+    "brand": "LEGO",
+    "category": "Collectible",
+    "price": "$169",
+    "url": "https://www.amazon.com/dp/B08T26NDPN",
+    "image": "/images/911-lego.webp",
+    "note": "Collectible Turbo Targa 2in1 model kit."
+  },
+  {
+    "id": "lego-lamborghini-countach",
+    "title": "Lamborghini Countach 5000",
+    "brand": "LEGO",
+    "category": "Collectible",
+    "price": "$180",
+    "url": "https://www.amazon.com/dp/B0DJ184XGM",
+    "image": "/images/countach-lego.webp",
+    "note": "The iconic 80s supercar, built piece by piece."
+  },
+  {
+    "id": "mcqueen-scarf-black",
+    "title": "McQueen Scarf Black",
+    "brand": "McQueen",
+    "category": "Accessory",
+    "price": "$312",
+    "url": "https://essxnyc.com/products/mcqueen-skull-silk-scarf-black-ivory",
+    "image": "/images/black-mqueen-scarf.webp",
+    "note": "The iconic 80s supercar, built piece by piece."
+  },
+  {
+    "id": "salomon-xt6-goretex",
+    "title": "XT-6 Gore-Tex Black/Silver",
+    "brand": "Salomon",
+    "category": "Sneakers",
+    "price": "$230",
+    "url": "https://www.farfetch.com/ao/shopping/women/salomon-xt-6-gore-tex-blacksilver-sneakers-item-25737077.aspx",
+    "image": "/images/salomon-black-silver.webp",
+    "note": "Waterproof trail runners with iconic Salomon design."
+  }
+]

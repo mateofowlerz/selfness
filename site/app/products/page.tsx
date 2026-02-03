@@ -1,96 +1,82 @@
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 import Image from "next/image";
-import Link from "next/link";
 
-interface Product {
+interface WishlistItem {
 	id: string;
-	url: string;
 	title: string;
-	description: string;
+	url: string;
 	image: string;
-	createdAt: string;
+	brand?: string;
+	category?: string;
+	price?: string;
+	note?: string;
+	badge?: string;
+	addedAt?: string;
 }
 
-function getProducts(): Product[] {
-	const productsPath = path.join(process.cwd(), "..", "products.json");
+function getWishlist(): WishlistItem[] {
+	const wishlistPath = path.join(process.cwd(), "..", "wishlist.json");
 	try {
-		const data = fs.readFileSync(productsPath, "utf-8");
-		return JSON.parse(data);
+		const data = fs.readFileSync(wishlistPath, "utf-8");
+		const parsed = JSON.parse(data);
+		if (!Array.isArray(parsed)) return [];
+		return parsed;
 	} catch {
 		return [];
 	}
 }
 
 export default function ProductsPage() {
-	const products = getProducts();
+	const wishlist = getWishlist();
 
 	return (
-		<main className="flex flex-col gap-8">
-			<div className="flex flex-col gap-2">
-				<h1 className="text-2xl font-semibold tracking-tight">
-					Things I Love
-				</h1>
-				<p className="text-(--muted)">
-					A curated collection of products, tools, and things that bring me joy.
-				</p>
-			</div>
+		<main className="flex flex-col gap-2">
+			<header className="flex flex-col gap-3">
+				<h1 className="text-2xl font-semibold tracking-tight">Wishlist</h1>
+			</header>
 
-			{products.length === 0 ? (
-				<p className="text-(--muted)">No products yet.</p>
+			{wishlist.length === 0 ? (
+				<p className="text-(--muted)">No wishlist items yet.</p>
 			) : (
-				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-					{products.map((product) => (
-						<a
-							key={product.id}
-							href={product.url}
-							target="_blank"
-							rel="noopener noreferrer"
-							className="group block rounded-xl overflow-hidden bg-white border border-black/5 transition-shadow duration-200 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 md:hover:shadow-lg"
-						>
-							<div className="aspect-[4/3] relative overflow-hidden bg-black/5">
-								{product.image && (
+				<div className="relative left-1/2 right-1/2 -mx-[50vw] w-screen">
+					<div className="grid grid-cols-2 lg:grid-cols-4 border-t border-l border-black/90">
+						{wishlist.map((item) => (
+							<a
+								key={item.id}
+								href={item.url}
+								target="_blank"
+								rel="noopener noreferrer"
+								className="group flex flex-col border-r border-b border-black/90 bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-black/40 touch-manipulation"
+							>
+								<div className="aspect-square overflow-hidden flex items-center justify-center p-6 sm:p-8">
 									<Image
-										src={product.image}
-										alt={product.title}
-										fill
-										className="object-cover transition-transform duration-300 ease-out md:group-hover:scale-105"
-										sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+										src={item.image}
+										alt={item.title}
+										width={600}
+										height={600}
+										className="h-full w-full object-contain transition-transform duration-250 ease-out motion-reduce:transition-none [@media(hover:hover)_and_(pointer:fine)]:group-hover:scale-105"
+										sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 25vw"
 									/>
-								)}
-							</div>
-							<div className="p-4">
-								<h2 className="font-medium text-base leading-tight mb-1 transition-colors duration-150 ease-out md:group-hover:text-primary">
-									{product.title}
-								</h2>
-								<p className="text-sm text-(--muted) line-clamp-2">
-									{product.description}
-								</p>
-							</div>
-						</a>
-					))}
+								</div>
+								<div className="flex flex-col gap-1 p-2 border-t border-black/90">
+									<p className="text-xs sm:text-sm font-medium uppercase text-black/40 italic">
+										{item.brand}
+									</p>
+									<p className="text-xs sm:text-sm font-medium uppercase text-black line-clamp-1">
+										{item.title}
+									</p>
+									{item.price && (
+										<p className="text-xs sm:text-sm font-normal text-black tabular-nums">
+											{item.price}
+										</p>
+									)}
+								</div>
+							</a>
+						))}
+					</div>
 				</div>
 			)}
-
-			<Link
-				href="/admin/products"
-				className="fixed bottom-6 right-6 w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center shadow-lg transition-all duration-200 ease-out md:hover:bg-primary-dark md:hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-				aria-label="Add new product"
-			>
-				<svg
-					width="24"
-					height="24"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					strokeWidth="2"
-					strokeLinecap="round"
-					strokeLinejoin="round"
-				>
-					<line x1="12" y1="5" x2="12" y2="19" />
-					<line x1="5" y1="12" x2="19" y2="12" />
-				</svg>
-			</Link>
 		</main>
 	);
 }
