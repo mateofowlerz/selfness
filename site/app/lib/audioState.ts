@@ -32,7 +32,7 @@ function getAudio(): HTMLAudioElement {
   if (!globalAudio && typeof window !== "undefined") {
     globalAudio = new Audio();
     globalAudio.addEventListener("timeupdate", () => {
-      state.progress = globalAudio?.currentTime;
+      state.progress = globalAudio?.currentTime ?? 0;
       state.duration = globalAudio?.duration || 0;
       notifyListeners();
     });
