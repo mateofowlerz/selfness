@@ -38,5 +38,15 @@
     "url": "https://www.farfetch.com/ao/shopping/women/salomon-xt-6-gore-tex-blacksilver-sneakers-item-25737077.aspx",
     "image": "/images/salomon-black-silver.webp",
     "note": "Waterproof trail runners with iconic Salomon design."
+  },
+  {
+    "id": "aventon-ramblas",
+    "title": "Ramblas eMTB",
+    "brand": "Aventon",
+    "category": "Bike",
+    "price": "$2,899",
+    "url": "https://www.aventon.com/products/ramblas-electric-mountain-bike?variant=42879809913027",
+    "image": "/images/aventon-ramblas.jpg",
+    "note": "Mid-drive electric mountain bike, 100Nm torque, up to 90-mile range."
   }
 ]
