@@ -19,7 +19,7 @@ export default function ProductsPage() {
             {wishlist.map((item) => (
               <Link
                 key={item.id}
-                href={`/products/${item.id}`}
+                href={item.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group flex flex-col border-r border-b border-black/90 bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-black/40 touch-manipulation"

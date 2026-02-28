@@ -34,15 +34,17 @@ export default function Home() {
 	const writingsDir = path.join(process.cwd(), "..", "writings");
 	const files = fs.readdirSync(writingsDir).filter((f) => f.endsWith(".md"));
 
-	const writings = files.map((file) => {
-		const content = fs.readFileSync(path.join(writingsDir, file), "utf-8");
-		const frontmatter = parseFrontmatter(content);
-		return {
-			slug: file.replace(".md", ""),
-			title: frontmatter.title || file.replace(".md", ""),
-			date: frontmatter.date || null,
-		};
-	});
+	const writings = files
+		.filter((file) => file !== "beauty.md")
+		.map((file) => {
+			const content = fs.readFileSync(path.join(writingsDir, file), "utf-8");
+			const frontmatter = parseFrontmatter(content);
+			return {
+				slug: file.replace(".md", ""),
+				title: frontmatter.title || file.replace(".md", ""),
+				date: frontmatter.date || null,
+			};
+		});
 
 	return (
 		<main className="flex flex-col gap-6">
