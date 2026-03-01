@@ -48,5 +48,14 @@
     "url": "https://www.aventon.com/products/ramblas-electric-mountain-bike?variant=42879809913027",
     "image": "/images/aventon-ramblas.jpg",
     "note": "Mid-drive electric mountain bike, 100Nm torque, up to 90-mile range."
+  },
+  {
+    "id": "fugazi-firestorm-jacket-red",
+    "title": "Firestorm Jacket Red",
+    "brand": "FUGAZI",
+    "category": "Jacket",
+    "price": "$248",
+    "url": "https://fugazi.net/collections/all/products/firestorm-jacket-red?variant=45278381146284",
+    "image": "/images/fugazi-firestorm-jacket-red.png"
   }
 ]

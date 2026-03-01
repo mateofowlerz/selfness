@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import "./globals.css";
+import Breadcrumbs from "./components/Breadcrumbs";
 import MiniPlayer from "./components/MiniPlayer";
 
 export const metadata: Metadata = {
-  title: "writings",
+  title: "Mateo Zarate",
 };
 
 export default function RootLayout({
@@ -34,6 +35,7 @@ export default function RootLayout({
               </a>
             </div>
           </header>
+          <Breadcrumbs />
           {children}
         </div>
         {modal}

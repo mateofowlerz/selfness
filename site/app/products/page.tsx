@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import { getWishlist } from "./utils";
 
 export default function ProductsPage() {
@@ -17,9 +16,9 @@ export default function ProductsPage() {
         <div className="relative left-1/2 right-1/2 -mx-[50vw] w-screen">
           <div className="grid grid-cols-2 lg:grid-cols-4 border-t border-l border-black/90">
             {wishlist.map((item) => (
-              <Link
+              <a
                 key={item.id}
-                href={`/products/${item.id}`}
+                href={item.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group flex flex-col border-r border-b border-black/90 bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-black/40 touch-manipulation"
@@ -39,7 +38,7 @@ export default function ProductsPage() {
                   <p className="text-xs sm:text-sm font-medium uppercase text-black line-clamp-1">{item.title}</p>
                   {item.price && <p className="text-xs sm:text-sm font-normal text-black tabular-nums">{item.price}</p>}
                 </div>
-              </Link>
+              </a>
             ))}
           </div>
         </div>
