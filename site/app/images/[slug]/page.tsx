@@ -49,7 +49,7 @@ export default async function ImagePage({ params }: { params: Promise<{ slug: st
     return (
       <main>
         <h1>Image not found</h1>
-        <Link href="/">← Back to writings</Link>
+        <Link href="/">← Back</Link>
       </main>
     );
   }

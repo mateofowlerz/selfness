@@ -1,5 +1,3 @@
-import fs from "node:fs";
-import path from "node:path";
 import Link from "next/link";
 
 const Section = ({ children }: { children: React.ReactNode }) => {
@@ -8,42 +6,7 @@ const Section = ({ children }: { children: React.ReactNode }) => {
 	);
 };
 
-function parseFrontmatter(content: string) {
-	const match = content.match(/^---\n([\s\S]*?)\n---/);
-	if (!match) return {};
-	const frontmatter: Record<string, string> = {};
-	match[1].split("\n").forEach((line) => {
-		const [key, ...rest] = line.split(":");
-		if (key && rest.length) {
-			frontmatter[key.trim()] = rest.join(":").trim();
-		}
-	});
-	return frontmatter;
-}
-
-function formatDate(dateStr: string) {
-	const date = new Date(dateStr);
-	return date.toLocaleDateString("en-US", {
-		month: "short",
-		day: "numeric",
-		year: "numeric",
-	});
-}
-
 export default function Home() {
-	const writingsDir = path.join(process.cwd(), "..", "writings");
-	const files = fs.readdirSync(writingsDir).filter((f) => f.endsWith(".md"));
-
-	const writings = files.map((file) => {
-		const content = fs.readFileSync(path.join(writingsDir, file), "utf-8");
-		const frontmatter = parseFrontmatter(content);
-		return {
-			slug: file.replace(".md", ""),
-			title: frontmatter.title || file.replace(".md", ""),
-			date: frontmatter.date || null,
-		};
-	});
-
 	return (
 		<main className="flex flex-col gap-6">
 			<Section>
@@ -62,21 +25,6 @@ export default function Home() {
 					, a company that&apos;s building the best shopping experience ever
 					made.
 				</p>
-			</Section>
-			<Section>
-				<p className="font-semibold ">Writing</p>
-				{writings.map((w) => (
-					<Link
-						key={w.slug}
-						href={`/${w.slug}`}
-						className="flex justify-between items-center"
-					>
-						<span className="md:hover:text-primary-dark transition-colors">
-							{w.title.charAt(0).toUpperCase() + w.title.slice(1)}
-						</span>
-						{w.date && <span>{formatDate(w.date)}</span>}
-					</Link>
-				))}
 			</Section>
 			<Section>
 				<Link href="/products" className="flex justify-between items-center">

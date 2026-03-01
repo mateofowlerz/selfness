@@ -4,7 +4,7 @@ import "./globals.css";
 import MiniPlayer from "./components/MiniPlayer";
 
 export const metadata: Metadata = {
-  title: "writings",
+  title: "Mateo Zarate",
 };
 
 export default function RootLayout({

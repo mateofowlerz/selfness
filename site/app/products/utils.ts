@@ -25,13 +25,3 @@ export function getWishlist(): WishlistItem[] {
     return [];
   }
 }
-
-export function getWishlistItem(id: string): WishlistItem {
-  const wishlist = getWishlist();
-  const item = wishlist.find((item) => item.id === id);
-  if (!item) {
-    throw new Error("Wishlist item not found");
-  }
-
-  return item;
-}
