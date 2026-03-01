@@ -5,7 +5,7 @@ import Breadcrumbs from "./components/Breadcrumbs";
 import MiniPlayer from "./components/MiniPlayer";
 
 export const metadata: Metadata = {
-  title: "Mateo Zarate",
+  title: "Mateo Fowler",
 };
 
 export default function RootLayout({
@@ -21,7 +21,7 @@ export default function RootLayout({
         <div className="max-w-[640px] mx-auto px-4 sm:px-8">
           <header className="pt-8">
             <Link href="/" className="block no-underline">
-              <div className="font-semibold text-base text-(--fg) leading-tight">Mateo Zarate</div>
+              <div className="font-semibold text-base text-(--fg) leading-tight">Mateo Fowler</div>
             </Link>
             <div className="text-base text-(--muted) leading-tight">
               Co-founder at{" "}
