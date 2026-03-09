@@ -77,7 +77,7 @@
     "category": "Shoes",
     "price": "$995",
     "url": "https://fourtwofour.com/products/derby-washed-leather-black",
-    "image": "/images/derby-washed-leather-black.jpg",
+    "image": "/images/derby-washed-leather-black.png",
     "addedAt": "2026-03-09T22:57:00Z"
   },
   {
@@ -98,7 +98,7 @@
     "category": "Accessory",
     "price": "$85",
     "url": "https://edie-parker.com/products/cabochon-lighter-sleeve",
-    "image": "/images/gemstoned-lighter-case.jpg",
+    "image": "/images/gemstoned-lighter-case.png",
     "note": "Lighter jewelry — encrusted with multi-colored cabochons on all sides.",
     "addedAt": "2026-03-10T00:14:00Z"
   }
