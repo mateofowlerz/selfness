@@ -34,6 +34,14 @@ export default function Home() {
 					<span className="text-(--muted)">→</span>
 				</Link>
 			</Section>
+			<Section>
+				<Link href="/vault" className="flex justify-between items-center">
+					<span className="font-semibold md:hover:text-primary-dark transition-colors">
+						Vault
+					</span>
+					<span className="text-(--muted)">→</span>
+				</Link>
+			</Section>
 		</main>
 	);
 }
