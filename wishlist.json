@@ -112,5 +112,27 @@
     "image": "/images/hhkb-hybrid-type-s.jpg",
     "note": "Topre 45g silent switches, Bluetooth + USB-C, compact 60% layout.",
     "addedAt": "2026-03-10T00:44:00Z"
+  },
+  {
+    "id": "pappo-blues-magazine",
+    "title": "Pappo's Blues Rare Magazine",
+    "brand": "Pappo",
+    "category": "Collectible",
+    "price": "$50",
+    "url": "https://www.ebay.com/itm/277415754519",
+    "image": "/images/pappo-blues-magazine.webp",
+    "note": "Rare Argentine magazine featuring Pappo's Blues.",
+    "addedAt": "2026-03-10T00:47:00Z"
+  },
+  {
+    "id": "pappo-rolling-stone",
+    "title": "Rolling Stone Special Bookazine",
+    "brand": "Pappo",
+    "category": "Collectible",
+    "price": "$78",
+    "url": "https://www.ebay.com/itm/277415801160",
+    "image": "/images/pappo-rolling-stone.webp",
+    "note": "Rolling Stone Argentina special edition bookazine on Pappo.",
+    "addedAt": "2026-03-10T00:47:00Z"
   }
 ]
