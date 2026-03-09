@@ -101,5 +101,16 @@
     "image": "/images/gemstoned-lighter-case.png",
     "note": "Lighter jewelry — encrusted with multi-colored cabochons on all sides.",
     "addedAt": "2026-03-10T00:14:00Z"
+  },
+  {
+    "id": "hhkb-hybrid-type-s",
+    "title": "Professional Hybrid Type-S",
+    "brand": "HHKB",
+    "category": "Keyboard",
+    "price": "$299",
+    "url": "https://store.pfu-us.ricoh.com/cg01000-297001/",
+    "image": "/images/hhkb-hybrid-type-s.jpg",
+    "note": "Topre 45g silent switches, Bluetooth + USB-C, compact 60% layout.",
+    "addedAt": "2026-03-10T00:44:00Z"
   }
 ]
