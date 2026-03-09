@@ -77,7 +77,7 @@
     "category": "Shoes",
     "price": "$995",
     "url": "https://fourtwofour.com/products/derby-washed-leather-black",
-    "image": "/images/derby-washed-leather-black.webp",
+    "image": "/images/derby-washed-leather-black.jpg",
     "addedAt": "2026-03-09T22:57:00Z"
   },
   {
@@ -90,5 +90,16 @@
     "image": "/images/elevine-bracelet.webp",
     "note": "Handmade sterling silver bracelet.",
     "addedAt": "2026-03-09T22:57:00Z"
+  },
+  {
+    "id": "gemstoned-lighter-case",
+    "title": "Gemstoned Lighter Case in Multi-stone",
+    "brand": "Edie Parker",
+    "category": "Accessory",
+    "price": "$85",
+    "url": "https://edie-parker.com/products/cabochon-lighter-sleeve",
+    "image": "/images/gemstoned-lighter-case.jpg",
+    "note": "Lighter jewelry — encrusted with multi-colored cabochons on all sides.",
+    "addedAt": "2026-03-10T00:14:00Z"
   }
 ]
