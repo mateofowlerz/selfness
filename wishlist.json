@@ -69,5 +69,26 @@
     "note": "Heart-shaped ashtray, handmade in England, 24K gold & platinum silver detailing.",
     "badge": "Sold Out",
     "addedAt": "2026-03-09T22:22:00Z"
+  },
+  {
+    "id": "derby-washed-leather-black",
+    "title": "Derby Washed Leather in Black",
+    "brand": "424",
+    "category": "Shoes",
+    "price": "$995",
+    "url": "https://fourtwofour.com/products/derby-washed-leather-black",
+    "image": "/images/derby-washed-leather-black.webp",
+    "addedAt": "2026-03-09T22:57:00Z"
+  },
+  {
+    "id": "elevine-bracelet",
+    "title": "Elevine Bracelet",
+    "brand": "Dunton Ellerkamp",
+    "category": "Jewelry",
+    "price": "$400",
+    "url": "https://www.duntonellerkamp.com/jewelry/p/elevine-bracelet",
+    "image": "/images/elevine-bracelet.webp",
+    "note": "Handmade sterling silver bracelet.",
+    "addedAt": "2026-03-09T22:57:00Z"
   }
 ]
