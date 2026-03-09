@@ -57,5 +57,17 @@
     "price": "$248",
     "url": "https://fugazi.net/collections/all/products/firestorm-jacket-red?variant=45278381146284",
     "image": "/images/fugazi-firestorm-jacket-red.png"
+  },
+  {
+    "id": "cross-my-heart-ashtray",
+    "title": "Cross My Heart Ashtray",
+    "brand": "The Rolling And The Stoned",
+    "category": "Home",
+    "price": "£450",
+    "url": "https://therollingandthestoned.co.uk/products/cross-my-heart",
+    "image": "/images/cross-my-heart-ashtray.jpg",
+    "note": "Heart-shaped ashtray, handmade in England, 24K gold & platinum silver detailing.",
+    "badge": "Sold Out",
+    "addedAt": "2026-03-09T22:22:00Z"
   }
 ]
