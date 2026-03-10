@@ -10,6 +10,7 @@ interface WishlistItem {
   category?: string;
   price?: string;
   note?: string;
+  fill?: boolean;
   badge?: string;
   addedAt?: string;
 }

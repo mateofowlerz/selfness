@@ -23,13 +23,13 @@ export default function ProductsPage() {
                 rel="noopener noreferrer"
                 className="group flex flex-col border-r border-b border-black/90 bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-black/40 touch-manipulation"
               >
-                <div className="aspect-square overflow-hidden flex items-center justify-center p-6 sm:p-8">
+                <div className={`aspect-square overflow-hidden flex items-center justify-center ${item.fill ? '' : 'p-6 sm:p-8'}`}>
                   <Image
                     src={item.image}
                     alt={item.title}
                     width={600}
                     height={600}
-                    className="h-full w-full object-contain transition-transform duration-250 ease-out motion-reduce:transition-none [@media(hover:hover)_and_(pointer:fine)]:group-hover:scale-105"
+                    className={`h-full w-full ${item.fill ? 'object-cover' : 'object-contain'} transition-transform duration-250 ease-out motion-reduce:transition-none [@media(hover:hover)_and_(pointer:fine)]:group-hover:scale-105`}
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 25vw"
                   />
                 </div>
