@@ -17,7 +17,8 @@
     "price": "$180",
     "url": "https://www.amazon.com/dp/B0DJ184XGM",
     "image": "/images/countach-lego.webp",
-    "note": "The iconic 80s supercar, built piece by piece."
+    "note": "The iconic 80s supercar, built piece by piece.",
+    "bought": true
   },
   {
     "id": "mcqueen-scarf-black",
