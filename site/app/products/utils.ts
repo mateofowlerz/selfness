@@ -12,7 +12,6 @@ interface WishlistItem {
   note?: string;
   fill?: boolean;
   badge?: string;
-  bought?: boolean;
   addedAt?: string;
 }
 
