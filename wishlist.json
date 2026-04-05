@@ -136,5 +136,16 @@
     "image": "/images/pappo-rolling-stone.webp",
     "note": "Rolling Stone Argentina special edition bookazine on Pappo.",
     "addedAt": "2026-03-10T00:47:00Z"
+  },
+  {
+    "id": "salomon-x-alp-carhartt-wip",
+    "title": "X-ALP Carhartt WIP",
+    "brand": "Salomon",
+    "category": "Sneakers",
+    "price": "$192",
+    "url": "https://the-broken-arm.com/en/salomon/13487-salomon-x-alp-carhartt-wip.html",
+    "image": "/images/salomon-x-alp-carhartt-wip.webp",
+    "note": "Salomon x Carhartt WIP collab. Black.",
+    "addedAt": "2026-04-05T17:17:00Z"
   }
 ]

@@ -1,6 +1,7 @@
 ---
 title: SpaceX's fourth Falcon 1 launch
 date: 2025-01-24
+hidden: true
 ---
 
 # SpaceX's fourth Falcon 1 launch

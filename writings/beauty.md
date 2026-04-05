@@ -1,6 +1,7 @@
 ---
 title: On beauty
 date: 2025-12-30
+hidden: true
 ---
 
 # What beauty is
@@ -42,4 +43,3 @@ When people try hard to make something beautiful, they sometimes found themselve
 ![SR-71 Blackbird](/images/Lockheed_SR-71_Blackbird.jpg). It looks like it's going to fucking kill you. Absolutely timeless and weird. 
 
 ▶[Supersonic|Definitely Maybe|/covers/definitely-maybe.jpg](/music/06%20-%20Supersonic%20(Remastered).mp3). It's a really simple song with simple lyrics and simple sounds yet makes you feel completely supersonic. You suddenly became invincible for 3 minutes.
-
