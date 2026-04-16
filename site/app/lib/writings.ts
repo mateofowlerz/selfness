@@ -7,7 +7,8 @@ export type Writing = {
   title: string;
 };
 
-type WritingWithVisibility = Writing & {
+export type WritingDocument = Writing & {
+  content: string;
   hidden: boolean;
 };
 
@@ -38,41 +39,74 @@ function formatFallbackTitle(slug: string) {
     .join(" ");
 }
 
-export function getAllWritings(): Writing[] {
+function sortWritings<T extends Writing>(writings: T[]): T[] {
+  return [...writings].sort((a, b) => {
+    if (a.date && b.date && a.date !== b.date) {
+      return b.date.localeCompare(a.date);
+    }
+
+    if (a.date && !b.date) {
+      return -1;
+    }
+
+    if (!a.date && b.date) {
+      return 1;
+    }
+
+    return a.title.localeCompare(b.title);
+  });
+}
+
+function getAllWritingDocuments(): WritingDocument[] {
   if (!fs.existsSync(WRITINGS_DIR)) {
     return [];
   }
 
-  return fs
-    .readdirSync(WRITINGS_DIR)
-    .filter((file) => file.endsWith(".md"))
-    .map((file) => {
-      const slug = file.replace(/\.md$/, "");
-      const content = fs.readFileSync(path.join(WRITINGS_DIR, file), "utf-8");
-      const frontmatter = getFrontmatter(content);
+  return sortWritings(
+    fs
+      .readdirSync(WRITINGS_DIR)
+      .filter((file) => file.endsWith(".md"))
+      .map((file) => {
+        const slug = file.replace(/\.md$/, "");
+        const content = fs.readFileSync(path.join(WRITINGS_DIR, file), "utf-8");
+        const frontmatter = getFrontmatter(content);
 
-      return {
-        date: getFrontmatterField(frontmatter, "date"),
-        hidden: getBooleanFrontmatterField(frontmatter, "hidden"),
-        slug,
-        title: getFrontmatterField(frontmatter, "title") ?? formatFallbackTitle(slug),
-      } satisfies WritingWithVisibility;
-    })
+        return {
+          content,
+          date: getFrontmatterField(frontmatter, "date"),
+          hidden: getBooleanFrontmatterField(frontmatter, "hidden"),
+          slug,
+          title: getFrontmatterField(frontmatter, "title") ?? formatFallbackTitle(slug),
+        } satisfies WritingDocument;
+      }),
+  );
+}
+
+export function getAllWritings(): Writing[] {
+  return getAllWritingDocuments()
     .filter((writing) => !writing.hidden)
-    .map(({ hidden: _hidden, ...writing }) => writing)
-    .sort((a, b) => {
-      if (a.date && b.date && a.date !== b.date) {
-        return b.date.localeCompare(a.date);
-      }
+    .map(({ content: _content, hidden: _hidden, ...writing }) => writing);
+}
 
-      if (a.date && !b.date) {
-        return -1;
-      }
+export function getWritingBySlug(slug: string): WritingDocument | null {
+  const filePath = path.join(WRITINGS_DIR, `${slug}.md`);
 
-      if (!a.date && b.date) {
-        return 1;
-      }
+  if (!fs.existsSync(filePath)) {
+    return null;
+  }
 
-      return a.title.localeCompare(b.title);
-    });
+  const content = fs.readFileSync(filePath, "utf-8");
+  const frontmatter = getFrontmatter(content);
+
+  return {
+    content,
+    date: getFrontmatterField(frontmatter, "date"),
+    hidden: getBooleanFrontmatterField(frontmatter, "hidden"),
+    slug,
+    title: getFrontmatterField(frontmatter, "title") ?? formatFallbackTitle(slug),
+  };
+}
+
+export function getVisibleWritingSlugs(): string[] {
+  return getAllWritings().map(({ slug }) => slug);
 }

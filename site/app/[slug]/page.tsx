@@ -1,11 +1,13 @@
 import fs from "node:fs";
 import path from "node:path";
 import Image from "next/image";
+import { notFound } from "next/navigation";
 import React from "react";
 import Markdown from "react-markdown";
 import ImageGallery from "../components/ImageGallery";
 import ImageLink from "../components/ImageLink";
 import MusicPlayer from "../components/MusicPlayer";
+import { getVisibleWritingSlugs, getWritingBySlug } from "../lib/writings";
 
 const SUPPORTED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg", ".avif"];
 
@@ -43,9 +45,7 @@ function getGalleryImages(folderPath: string): { src: string; slug: string }[] |
 }
 
 export async function generateStaticParams() {
-  const writingsDir = path.join(process.cwd(), "..", "writings");
-  const files = fs.readdirSync(writingsDir).filter((f) => f.endsWith(".md"));
-  return files.map((file) => ({ slug: file.replace(".md", "") }));
+  return getVisibleWritingSlugs().map((slug) => ({ slug }));
 }
 
 function stripFrontmatter(content: string) {
@@ -91,9 +91,13 @@ function processMusicLinks(children: React.ReactNode): React.ReactNode {
 
 export default async function Writing({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const filePath = path.join(process.cwd(), "..", "writings", `${slug}.md`);
-  const rawContent = fs.readFileSync(filePath, "utf-8");
-  const content = stripFrontmatter(rawContent);
+  const writing = getWritingBySlug(slug);
+
+  if (!writing || writing.hidden) {
+    notFound();
+  }
+
+  const content = stripFrontmatter(writing.content);
 
   return (
     <main>

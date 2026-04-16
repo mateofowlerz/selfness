@@ -1,6 +1,7 @@
 ---
 title: Why not choosing life?
 date: 2026-03-24
+hidden: true
 ---
 
 # Why not choosing life?

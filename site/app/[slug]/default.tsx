@@ -1,8 +1,7 @@
-import fs from "node:fs";
-import path from "node:path";
 import Image from "next/image";
 import Link from "next/link";
 import Markdown from "react-markdown";
+import { getWritingBySlug } from "../lib/writings";
 
 function getImageSlug(src: string | undefined | Blob): string | null {
   if (!src || typeof src !== "string") return null;
@@ -18,13 +17,11 @@ function getImageSlug(src: string | undefined | Blob): string | null {
 
 export default async function WritingDefault({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const filePath = path.join(process.cwd(), "..", "writings", `${slug}.md`);
+  const writing = getWritingBySlug(slug);
 
-  if (!fs.existsSync(filePath)) {
+  if (!writing || writing.hidden) {
     return null;
   }
-
-  const content = fs.readFileSync(filePath, "utf-8");
 
   return (
     <main>
@@ -54,7 +51,7 @@ export default async function WritingDefault({ params }: { params: Promise<{ slu
           li: ({ children }) => <li>{children}</li>,
         }}
       >
-        {content}
+        {writing.content}
       </Markdown>
     </main>
   );
