@@ -1,5 +1,4 @@
 import Link from "next/link";
-import AboutCarousel from "./components/AboutCarousel";
 import MediaSection from "./components/MediaSection";
 import { getAllWritings } from "./lib/writings";
 
@@ -55,7 +54,6 @@ export default function Home() {
           </a>
           , a company that&apos;s building the best shopping experience ever made.
         </p>
-        <AboutCarousel />
       </Section>
       <Section className="-mt-2 pb-[50px]">
         <MediaSection items={media} />
