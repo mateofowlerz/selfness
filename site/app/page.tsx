@@ -1,9 +1,38 @@
 import Link from "next/link";
+import MediaSection from "./components/MediaSection";
 import { getAllWritings } from "./lib/writings";
 
 const Section = ({ children }: { children: React.ReactNode }) => {
   return <section className="flex flex-col gap-2 pb-[50px]">{children}</section>;
 };
+
+const media = [
+  {
+    title: "Under 20 and building AI-focused companies",
+    outlet: "LA NACION",
+    url: "https://www.lanacion.com.ar/economia/negocios/tres-jovenes-argentinos-que-usan-la-ia-para-cambiar-sus-industrias-nid12112025/",
+  },
+  {
+    title: "From Entre Rios to Silicon Valley: under 20, rejected 100 times, and raised US$2.7 million",
+    outlet: "Forbes",
+    url: "https://www.forbesargentina.com/negocios/de-rios-silicon-valley-tienen-20-anos-rechazaron-100-veces-consiguieron-us-27-millones-n73939",
+  },
+  {
+    title: "Starting up at 20: three friends built an app that attracted global investors",
+    outlet: "El Cronista",
+    url: "https://www.cronista.com/apertura/emprendedoress/emprender-a-los-20-anos-tres-amigos-crearon-una-app-que-sedujo-a-inversores-globales/",
+  },
+  {
+    title: "Argentine AI startup raises US$2 million in round led by Mexican fund",
+    outlet: "Bloomberg Línea",
+    url: "https://www.bloomberglinea.com/latinoamerica/argentina/startup-argentina-de-inteligencia-artificial-levanta-us2m-en-ronda-liderada-por-fondo-mexicano/",
+  },
+  {
+    title: "Generation Colapinto: the under-20 founders who raised nearly US$3 million and want to win in the US",
+    outlet: "Infobae",
+    url: "https://www.infobae.com/economia/2025/04/20/generacion-colapinto-la-historia-de-los-emprendedores-sub-20-que-consiguieron-casi-usd-3-millones-y-quieren-triunfar-en-eeuu/",
+  },
+];
 
 export default function Home() {
   const writings = getAllWritings();
@@ -25,6 +54,9 @@ export default function Home() {
           </a>
           , a company that&apos;s building the best shopping experience ever made.
         </p>
+      </Section>
+      <Section>
+        <MediaSection items={media} />
       </Section>
       <Section>
         <Link href="/products" className="flex justify-between items-center">
