@@ -7,5 +7,68 @@
     "quarter": "Q1",
     "year": 2026,
     "url": "https://press.stripe.com/boom"
+  },
+  {
+    "id": "the-vital-question",
+    "title": "The Vital Question: Energy, Evolution, and the Origins of Complex Life",
+    "author": "Nick Lane",
+    "image": "/images/book-the-vital-question.jpg",
+    "quarter": "Q2",
+    "year": 2026,
+    "url": "https://openlibrary.org/books/OL27449635M/The_Vital_Question"
+  },
+  {
+    "id": "superintelligence",
+    "title": "Superintelligence: Paths, Dangers, Strategies",
+    "author": "Nick Bostrom",
+    "image": "/images/book-superintelligence.jpg",
+    "quarter": "Q2",
+    "year": 2026,
+    "url": "https://openlibrary.org/works/OL17319280W/Superintelligence"
+  },
+  {
+    "id": "the-scaling-era",
+    "title": "The Scaling Era: An Oral History of AI, 2019-2025",
+    "author": "Dwarkesh Patel with Gavin Leech",
+    "image": "/images/book-the-scaling-era.png",
+    "quarter": "Q2",
+    "year": 2026,
+    "url": "https://press.stripe.com/scaling"
+  },
+  {
+    "id": "where-is-my-flying-car",
+    "title": "Where Is My Flying Car?",
+    "author": "J. Storrs Hall",
+    "image": "/images/book-where-is-my-flying-car.png",
+    "quarter": "Q2",
+    "year": 2026,
+    "url": "https://press.stripe.com/where-is-my-flying-car"
+  },
+  {
+    "id": "elon-musk",
+    "title": "Elon Musk",
+    "author": "Walter Isaacson",
+    "image": "/images/book-elon-musk.jpg",
+    "quarter": "Q2",
+    "year": 2026,
+    "url": "https://www.simonandschuster.com/books/Elon-Musk/Walter-Isaacson/9781982181284"
+  },
+  {
+    "id": "the-fountainhead",
+    "title": "The Fountainhead",
+    "author": "Ayn Rand",
+    "image": "/images/book-the-fountainhead.jpg",
+    "quarter": "Q2",
+    "year": 2026,
+    "url": "https://www.penguinrandomhouse.com/books/296786/the-fountainhead-by-ayn-rand/"
+  },
+  {
+    "id": "atlas-shrugged",
+    "title": "Atlas Shrugged",
+    "author": "Ayn Rand",
+    "image": "/images/book-atlas-shrugged.jpg",
+    "quarter": "Q2",
+    "year": 2026,
+    "url": "https://www.penguinrandomhouse.com/books/296832/atlas-shrugged-by-ayn-rand/"
   }
 ]
