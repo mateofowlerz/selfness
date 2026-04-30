@@ -1,3 +1,4 @@
+import { GoogleAnalytics } from "@next/third-parties/google";
 import type { Metadata } from "next";
 import Link from "next/link";
 import "./globals.css";
@@ -41,6 +42,7 @@ export default function RootLayout({
         {modal}
         <MiniPlayer />
       </body>
+      <GoogleAnalytics gaId="G-J0VDNT8CSG" />
     </html>
   );
 }
