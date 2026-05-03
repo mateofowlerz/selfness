@@ -59,6 +59,12 @@ export default function Home() {
         <MediaSection items={media} />
       </Section>
       <Section>
+        <Link href="/cv" className="flex justify-between items-center">
+          <span className="font-semibold md:hover:text-primary-dark transition-colors">CV</span>
+          <span className="text-(--muted)">→</span>
+        </Link>
+      </Section>
+      <Section>
         <Link href="/products" className="flex justify-between items-center">
           <span className="font-semibold md:hover:text-primary-dark transition-colors">Wishlist</span>
           <span className="text-(--muted)">→</span>

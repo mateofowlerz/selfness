@@ -7,6 +7,7 @@ const LABEL_MAP: Record<string, string> = {
   products: "Wishlist",
   admin: "Admin",
   images: "Images",
+  cv: "CV",
 };
 
 function toLabel(segment: string): string {
