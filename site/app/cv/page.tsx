@@ -66,7 +66,7 @@ export default function CV() {
 	return (
 		<main className="flex flex-col gap-12">
 			<section className="flex flex-col gap-6">
-				<div className="relative w-full aspect-[4/3] overflow-hidden">
+				<div className="relative w-40 aspect-[4/3] overflow-hidden">
 					<Image
 						src="/images/mateo.png"
 						alt="Mateo Fowler"
@@ -95,9 +95,9 @@ export default function CV() {
 				</p>
 
 				<p>
-					Since I was out of high school I worked in my startup, solving
-					challenges across all areas of a company and building a successful
-					product from the ground up. I've solved from{" "}
+					I've built a succesful product from the ground up. I started my
+					company on 2022, everything I've built was LLM-based and was with help
+					of the chatbots/agents. I've solved from{" "}
 					<span className="font-semibold">
 						complex engineering problems, to distribution to hiring to
 						fundraising

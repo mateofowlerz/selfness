@@ -2,6 +2,7 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 import type { Metadata } from "next";
 import Link from "next/link";
 import "./globals.css";
+import AgeSuffix from "./components/AgeSuffix";
 import Breadcrumbs from "./components/Breadcrumbs";
 import ExportPdfButton from "./components/ExportPdfButton";
 import MiniPlayer from "./components/MiniPlayer";
@@ -24,7 +25,10 @@ export default function RootLayout({
           <header className="pt-8 flex items-start justify-between gap-4">
             <div>
               <Link href="/" className="block no-underline">
-                <div className="font-semibold text-base text-(--fg) leading-tight">Mateo Fowler</div>
+                <div className="font-semibold text-base text-(--fg) leading-tight">
+                  Mateo Fowler
+                  <AgeSuffix />
+                </div>
               </Link>
               <div className="text-base text-(--muted) leading-tight">
                 Co-founder at{" "}

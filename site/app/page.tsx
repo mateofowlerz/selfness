@@ -39,7 +39,7 @@ export default function Home() {
 
   return (
     <main className="flex flex-col gap-6">
-      <Section className="pb-0">
+      <Section>
         <p className="font-semibold ">About</p>
         <p>
           I co founded{"   "}
@@ -55,7 +55,7 @@ export default function Home() {
           , a company that&apos;s building the best shopping experience ever made.
         </p>
       </Section>
-      <Section className="-mt-2 pb-[50px]">
+      <Section>
         <MediaSection items={media} />
       </Section>
       <Section>
