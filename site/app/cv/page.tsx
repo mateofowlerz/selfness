@@ -16,7 +16,7 @@ const built = [
 	{
 		title: "Agent-based product recommendations",
 		items: [
-			"We had millions of products and it made no sense to show the same products to a 20y old college undergrad men and a 35y old yoga mom. I built an agent that sees every movement you make in the app and builds hypothesis on what you might want to see next. Then it matches that natural language with products.",
+			"We had millions of products and it made no sense to show the same products to a 20yo college undergrad man and a 35yo yoga mom. I built an agent that sees every movement you make in the app and builds hypotheses on what you might want to see next. Then it matches that natural language with products.",
 		],
 	},
 	{
@@ -25,18 +25,6 @@ const built = [
 			"Designed and coded the mobile React Native app that displayed these recommendations and millions of products in an intuitive, fast way.",
 		],
 	},
-];
-
-const investors = [
-	"Hi Ventures",
-	"Guillermo Rauch (Vercel)",
-	"Newtopia VC",
-	"Broom Ventures",
-	"Monashees",
-	"Kalei Ventures",
-	"Diego Pando (Bumeran)",
-	"Borja Martel Seward (Lemon)",
-	"Patricio Jutard (Mural)",
 ];
 
 const press = [
@@ -78,6 +66,17 @@ export default function CV() {
 				</div>
 			</section>
 
+			<p className="font-semibold">Education</p>
+			<section className="flex flex-col gap-4">
+				<p>
+					I'm self-taught. I started tinkering with computers when I
+					installed Linux at 13 and never stopped. Did some software engineering
+					side gigs while I was learning to program until I started my own
+					company at 17. Now I left my company and I'm learning about AI-safety
+					full time to solve the most important open questions of our lifetime.
+				</p>
+			</section>
+
 			<p className="font-semibold">What I built</p>
 			<section className="flex flex-col gap-4">
 				<p>
@@ -93,20 +92,9 @@ export default function CV() {
 					latest led by Hi Ventures with participation from Guillermo Rauch (CEO
 					of Vercel).
 				</p>
-
-				<p>
-					I've built a succesful product from the ground up. I started my
-					company on 2022, everything I've built was LLM-based and was with help
-					of the chatbots/agents. I've solved from{" "}
-					<span className="font-semibold">
-						complex engineering problems, to distribution to hiring to
-						fundraising
-					</span>
-					. I know how to solve things by myself.
-				</p>
 			</section>
 
-			<p className="font-semibold">Technichal achievements</p>
+			<p className="font-semibold">Technical achievements</p>
 			<section className="flex flex-col gap-8">
 				{built.map((group) => (
 					<div key={group.title} className="flex flex-col gap-3">
@@ -135,11 +123,6 @@ export default function CV() {
 				</a>{" "}
 				on the app store
 			</p>
-
-			<section className="flex flex-col gap-2">
-				<p className="font-semibold">Backed by</p>
-				<p className="text-(--muted)">{investors.join(" · ")}</p>
-			</section>
 
 			<section className="flex flex-col gap-2">
 				<p className="font-semibold">Press</p>
