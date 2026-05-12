@@ -22,7 +22,19 @@ const built = [
 	{
 		title: "Web and mobile platforms",
 		items: [
-			"Designed and coded the mobile React Native app that displayed these recommendations and millions of products in an intuitive, fast way.",
+			<>
+				Designed and coded the mobile React Native app and the full{" "}
+				<a
+					href="https://melian.com"
+					target="_blank"
+					rel="noopener noreferrer"
+					className="font-semibold md:hover:text-primary-dark transition-colors"
+				>
+					web app
+				</a>{" "}
+				(built in Next.js) that displayed these recommendations and millions of
+				products in an intuitive, fast way.
+			</>,
 		],
 	},
 ];
