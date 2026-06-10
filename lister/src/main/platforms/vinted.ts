@@ -2,6 +2,7 @@ import type { BrowserWindow } from "electron";
 import { readFileSync } from "node:fs";
 import { basename } from "node:path";
 import type { ConnectionStatus, Listing, PublishResult } from "../../shared/types";
+import { AdapterError, expectShape, request, toAdapterError } from "./apiClient";
 import { VINTED_PACKAGE_SIZE_ID, VINTED_STATUS_ID } from "./mapping";
 import { clearSession, cookieHeader, isLoggedIn, openLogin, type SessionLoginOptions } from "./sessionLogin";
 import type { PlatformAdapter } from "./types";
@@ -62,19 +63,28 @@ export class VintedAdapter implements PlatformAdapter {
     const form = new FormData();
     form.append("photo[type]", "item");
     form.append("photo[file]", new Blob([buf]), basename(path));
-    const res = await fetch(`${BASE}/api/v2/photos`, {
+    const resp = await request(`${BASE}/api/v2/photos`, {
+      platform: "vinted",
+      label: "photos (upload)",
       method: "POST",
       headers: { cookie, ...(csrf ? { "x-csrf-token": csrf } : {}) },
       body: form,
     });
-    if (!res.ok) throw new Error(`Vinted photo upload failed: ${res.status} ${await res.text()}`);
-    const json = (await res.json()) as { id: number | string };
+    const json = expectShape(
+      resp,
+      "vinted",
+      "photos (upload)",
+      (j): j is { id: number | string } =>
+        typeof j === "object" &&
+        j !== null &&
+        ["number", "string"].includes(typeof (j as Record<string, unknown>).id),
+    );
     return String(json.id);
   }
 
   async publish(listing: Listing): Promise<PublishResult> {
     try {
-      if (!(await isLoggedIn(loginOpts))) throw new Error("Vinted is not connected.");
+      if (!(await isLoggedIn(loginOpts))) throw new AdapterError("not_connected", "Vinted is not connected.");
       const cookie = await cookieHeader(PARTITION, BASE);
       const csrf = await this.csrfToken();
 
@@ -100,7 +110,9 @@ export class VintedAdapter implements PlatformAdapter {
         },
       };
 
-      const res = await fetch(`${BASE}/api/v2/items`, {
+      const resp = await request(`${BASE}/api/v2/items`, {
+        platform: "vinted",
+        label: "items (create)",
         method: "POST",
         headers: {
           cookie,
@@ -110,17 +122,29 @@ export class VintedAdapter implements PlatformAdapter {
         },
         body: JSON.stringify(body),
       });
-      if (!res.ok) throw new Error(`Vinted item create failed: ${res.status} ${await res.text()}`);
-      const json = (await res.json()) as { item?: { id: number | string; url?: string } };
-      const id = json.item?.id;
+      const json = expectShape(
+        resp,
+        "vinted",
+        "items (create)",
+        (j): j is { item: { id: number | string; url?: string } } => {
+          if (typeof j !== "object" || j === null) return false;
+          const item = (j as Record<string, unknown>).item;
+          return (
+            typeof item === "object" &&
+            item !== null &&
+            ["number", "string"].includes(typeof (item as Record<string, unknown>).id)
+          );
+        },
+      );
       return {
         platform: this.platform,
         ok: true,
-        listingId: id !== undefined ? String(id) : undefined,
-        listingUrl: json.item?.url,
+        listingId: String(json.item.id),
+        listingUrl: json.item.url,
       };
     } catch (err) {
-      return { platform: this.platform, ok: false, error: err instanceof Error ? err.message : String(err) };
+      const e = toAdapterError(err, "vinted", "publish");
+      return { platform: this.platform, ok: false, error: e.message, errorKind: e.kind };
     }
   }
 }

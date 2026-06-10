@@ -8,4 +8,5 @@ export const IPC = {
   publish: "listing:publish",
   pickPhotos: "photos:pick",
   readPhotoPreview: "photos:preview",
+  openDiagnostics: "diagnostics:open",
 } as const;

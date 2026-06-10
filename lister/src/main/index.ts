@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain } from "electron";
+import { app, BrowserWindow, dialog, ipcMain, shell } from "electron";
 import { readFileSync } from "node:fs";
 import { extname, join } from "node:path";
 import { IPC } from "../shared/ipc";
@@ -11,6 +11,7 @@ import {
   validateListing,
 } from "../shared/types";
 import { allAdapters, getAdapter } from "./platforms";
+import { diagnosticsPath } from "./storage/diagnostics";
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -65,7 +66,12 @@ function registerIpc(): void {
       const targets = platforms.filter((p): p is Platform => PLATFORMS.includes(p));
       const errors = validateListing(listing, targets);
       if (errors.length > 0) {
-        return targets.map((platform) => ({ platform, ok: false, error: errors.join(" ") }));
+        return targets.map((platform) => ({
+          platform,
+          ok: false,
+          error: errors.join(" "),
+          errorKind: "validation" as const,
+        }));
       }
       // Publish to each selected platform independently; one failure does not
       // block the others.
@@ -86,6 +92,12 @@ function registerIpc(): void {
     const mime = ext === "jpg" ? "jpeg" : ext;
     const data = readFileSync(path).toString("base64");
     return `data:image/${mime};base64,${data}`;
+  });
+
+  // Reveals the diagnostics log so a user (or we) can inspect or attach it to a
+  // bug report when an adapter reports the platform API changed.
+  ipcMain.handle(IPC.openDiagnostics, async (): Promise<void> => {
+    shell.showItemInFolder(diagnosticsPath());
   });
 }
 

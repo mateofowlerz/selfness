@@ -12,6 +12,7 @@ const api = {
     ipcRenderer.invoke(IPC.publish, listing, platforms),
   pickPhotos: (): Promise<string[]> => ipcRenderer.invoke(IPC.pickPhotos),
   readPhotoPreview: (path: string): Promise<string> => ipcRenderer.invoke(IPC.readPhotoPreview, path),
+  openDiagnostics: (): Promise<void> => ipcRenderer.invoke(IPC.openDiagnostics),
 };
 
 contextBridge.exposeInMainWorld("lister", api);

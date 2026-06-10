@@ -2,9 +2,16 @@ import type { BrowserWindow } from "electron";
 import { readFileSync } from "node:fs";
 import { basename } from "node:path";
 import type { ConnectionStatus, Listing, PublishResult } from "../../shared/types";
+import { AdapterError, expectShape, request, toAdapterError } from "./apiClient";
 import { DEPOP_CONDITION } from "./mapping";
 import { clearSession, cookieHeader, isLoggedIn, openLogin, type SessionLoginOptions } from "./sessionLogin";
 import type { PlatformAdapter } from "./types";
+
+// Shape guard shared by both publish paths: Depop returns the new product's id
+// and slug. If either is missing on a 2xx, the API contract changed.
+function isDepopProduct(j: unknown): j is { id?: string; slug?: string } {
+  return typeof j === "object" && j !== null;
+}
 
 // Depop has an official Selling API (OAuth 2.0 + PKCE), but it is partner-only:
 // access must be granted by Depop's partner team. So the adapter has two modes:
@@ -58,7 +65,8 @@ export class DepopAdapter implements PlatformAdapter {
       if (partnerApiKey()) return await this.publishViaPartnerApi(listing);
       return await this.publishViaSession(listing);
     } catch (err) {
-      return { platform: this.platform, ok: false, error: err instanceof Error ? err.message : String(err) };
+      const e = toAdapterError(err, "depop", "publish");
+      return { platform: this.platform, ok: false, error: e.message, errorKind: e.kind };
     }
   }
 
@@ -67,7 +75,9 @@ export class DepopAdapter implements PlatformAdapter {
   private async publishViaPartnerApi(listing: Listing): Promise<PublishResult> {
     const key = partnerApiKey();
     const headers = { authorization: `Bearer ${key}`, "content-type": "application/json" };
-    const res = await fetch(`${API_BASE}/api/v1/products`, {
+    const resp = await request(`${API_BASE}/api/v1/products`, {
+      platform: "depop",
+      label: "products (partner create)",
       method: "POST",
       headers,
       body: JSON.stringify({
@@ -80,8 +90,7 @@ export class DepopAdapter implements PlatformAdapter {
         hashtags: listing.tags,
       }),
     });
-    if (!res.ok) throw new Error(`Depop partner API create failed: ${res.status} ${await res.text()}`);
-    const json = (await res.json()) as { id?: string; slug?: string };
+    const json = expectShape(resp, "depop", "products (partner create)", isDepopProduct);
     return {
       platform: this.platform,
       ok: true,
@@ -91,7 +100,7 @@ export class DepopAdapter implements PlatformAdapter {
   }
 
   private async publishViaSession(listing: Listing): Promise<PublishResult> {
-    if (!(await isLoggedIn(loginOpts))) throw new Error("Depop is not connected.");
+    if (!(await isLoggedIn(loginOpts))) throw new AdapterError("not_connected", "Depop is not connected.");
     const cookie = await cookieHeader(PARTITION, BASE);
 
     // Upload photos first, collecting their ids.
@@ -100,13 +109,26 @@ export class DepopAdapter implements PlatformAdapter {
       const buf = readFileSync(photo.path);
       const form = new FormData();
       form.append("file", new Blob([buf]), basename(photo.path));
-      const up = await fetch(`${API_BASE}/api/v1/pictures/`, { method: "POST", headers: { cookie }, body: form });
-      if (!up.ok) throw new Error(`Depop picture upload failed: ${up.status} ${await up.text()}`);
-      const j = (await up.json()) as { id: string };
+      const up = await request(`${API_BASE}/api/v1/pictures/`, {
+        platform: "depop",
+        label: "pictures (upload)",
+        method: "POST",
+        headers: { cookie },
+        body: form,
+      });
+      const j = expectShape(
+        up,
+        "depop",
+        "pictures (upload)",
+        (v): v is { id: string } =>
+          typeof v === "object" && v !== null && typeof (v as Record<string, unknown>).id === "string",
+      );
       pictureIds.push(j.id);
     }
 
-    const res = await fetch(`${API_BASE}/api/v1/products/`, {
+    const resp = await request(`${API_BASE}/api/v1/products/`, {
+      platform: "depop",
+      label: "products (session create)",
       method: "POST",
       headers: { cookie, "content-type": "application/json" },
       body: JSON.stringify({
@@ -119,8 +141,7 @@ export class DepopAdapter implements PlatformAdapter {
         hashtags: listing.tags,
       }),
     });
-    if (!res.ok) throw new Error(`Depop product create failed: ${res.status} ${await res.text()}`);
-    const json = (await res.json()) as { id?: string; slug?: string };
+    const json = expectShape(resp, "depop", "products (session create)", isDepopProduct);
     return {
       platform: this.platform,
       ok: true,

@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import { basename } from "node:path";
 import type { ConnectionStatus, Listing, PublishResult } from "../../shared/types";
 import { getItem, removeItem, setItem } from "../storage/secureStore";
+import { AdapterError, expectShape, request, toAdapterError } from "./apiClient";
 import { EBAY_CONDITION, resolveCategoryId } from "./mapping";
 import type { PlatformAdapter } from "./types";
 
@@ -138,13 +139,24 @@ export class EbayAdapter implements PlatformAdapter {
       code,
       redirect_uri: cfg.redirectUri,
     });
-    const res = await fetch(`${host(cfg, "api")}/identity/v1/oauth2/token`, {
+    const resp = await request(`${host(cfg, "api")}/identity/v1/oauth2/token`, {
+      platform: "ebay",
+      label: "oauth/token (exchange)",
       method: "POST",
       headers: { "content-type": "application/x-www-form-urlencoded", authorization: basicAuthHeader(cfg) },
       body,
     });
-    if (!res.ok) throw new Error(`eBay token exchange failed: ${res.status} ${await res.text()}`);
-    const json = (await res.json()) as { access_token: string; refresh_token: string; expires_in: number };
+    const json = expectShape(
+      resp,
+      "ebay",
+      "oauth/token (exchange)",
+      (j): j is { access_token: string; refresh_token: string; expires_in: number } =>
+        typeof j === "object" &&
+        j !== null &&
+        typeof (j as Record<string, unknown>).access_token === "string" &&
+        typeof (j as Record<string, unknown>).refresh_token === "string" &&
+        typeof (j as Record<string, unknown>).expires_in === "number",
+    );
     return {
       accessToken: json.access_token,
       refreshToken: json.refresh_token,
@@ -154,7 +166,7 @@ export class EbayAdapter implements PlatformAdapter {
 
   private async validToken(cfg: EbayConfig): Promise<string> {
     const tokens = getItem<EbayTokens>(TOKENS_KEY);
-    if (!tokens) throw new Error("eBay is not connected.");
+    if (!tokens) throw new AdapterError("not_connected", "eBay is not connected.");
     if (Date.now() < tokens.expiresAt - 60_000) return tokens.accessToken;
 
     // Refresh using the long-lived refresh token.
@@ -163,13 +175,23 @@ export class EbayAdapter implements PlatformAdapter {
       refresh_token: tokens.refreshToken,
       scope: SCOPES.join(" "),
     });
-    const res = await fetch(`${host(cfg, "api")}/identity/v1/oauth2/token`, {
+    const resp = await request(`${host(cfg, "api")}/identity/v1/oauth2/token`, {
+      platform: "ebay",
+      label: "oauth/token (refresh)",
       method: "POST",
       headers: { "content-type": "application/x-www-form-urlencoded", authorization: basicAuthHeader(cfg) },
       body,
     });
-    if (!res.ok) throw new Error(`eBay token refresh failed: ${res.status} ${await res.text()}`);
-    const json = (await res.json()) as { access_token: string; expires_in: number };
+    const json = expectShape(
+      resp,
+      "ebay",
+      "oauth/token (refresh)",
+      (j): j is { access_token: string; expires_in: number } =>
+        typeof j === "object" &&
+        j !== null &&
+        typeof (j as Record<string, unknown>).access_token === "string" &&
+        typeof (j as Record<string, unknown>).expires_in === "number",
+    );
     const updated: EbayTokens = {
       ...tokens,
       accessToken: json.access_token,
@@ -181,7 +203,9 @@ export class EbayAdapter implements PlatformAdapter {
 
   async publish(listing: Listing): Promise<PublishResult> {
     const cfg = config();
-    if (!cfg) return { platform: this.platform, ok: false, error: "eBay is not configured." };
+    if (!cfg) {
+      return { platform: this.platform, ok: false, error: "eBay is not configured.", errorKind: "not_connected" };
+    }
     try {
       const token = await this.validToken(cfg);
       const api = host(cfg, "api");
@@ -192,10 +216,13 @@ export class EbayAdapter implements PlatformAdapter {
       };
       const sku = `lister-${randomUUID().slice(0, 12)}`;
 
-      // 1. Create or replace the inventory item.
-      const invRes = await fetch(`${api}/sell/inventory/v1/inventory_item/${sku}`, {
+      // 1. Create or replace the inventory item (eBay returns 204 No Content).
+      await request(`${api}/sell/inventory/v1/inventory_item/${sku}`, {
+        platform: "ebay",
+        label: "createInventoryItem",
         method: "PUT",
         headers,
+        okStatuses: [200, 204],
         body: JSON.stringify({
           availability: { shipToLocationAvailability: { quantity: 1 } },
           condition: EBAY_CONDITION[listing.condition],
@@ -208,9 +235,6 @@ export class EbayAdapter implements PlatformAdapter {
           },
         }),
       });
-      if (!invRes.ok && invRes.status !== 204) {
-        throw new Error(`createInventoryItem failed: ${invRes.status} ${await invRes.text()}`);
-      }
 
       // NOTE: eBay requires image URLs, not raw uploads. Production hosts the
       // photos (e.g. via eBay's media API or our own bucket) and passes the
@@ -218,7 +242,9 @@ export class EbayAdapter implements PlatformAdapter {
       void listing.photos.map((p) => basename(p.path));
 
       // 2. Stage an offer.
-      const offerRes = await fetch(`${api}/sell/inventory/v1/offer`, {
+      const offerResp = await request(`${api}/sell/inventory/v1/offer`, {
+        platform: "ebay",
+        label: "createOffer",
         method: "POST",
         headers,
         body: JSON.stringify({
@@ -236,13 +262,28 @@ export class EbayAdapter implements PlatformAdapter {
           },
         }),
       });
-      if (!offerRes.ok) throw new Error(`createOffer failed: ${offerRes.status} ${await offerRes.text()}`);
-      const { offerId } = (await offerRes.json()) as { offerId: string };
+      const { offerId } = expectShape(
+        offerResp,
+        "ebay",
+        "createOffer",
+        (j): j is { offerId: string } =>
+          typeof j === "object" && j !== null && typeof (j as Record<string, unknown>).offerId === "string",
+      );
 
       // 3. Publish the offer into a live listing.
-      const pubRes = await fetch(`${api}/sell/inventory/v1/offer/${offerId}/publish`, { method: "POST", headers });
-      if (!pubRes.ok) throw new Error(`publishOffer failed: ${pubRes.status} ${await pubRes.text()}`);
-      const { listingId } = (await pubRes.json()) as { listingId: string };
+      const pubResp = await request(`${api}/sell/inventory/v1/offer/${offerId}/publish`, {
+        platform: "ebay",
+        label: "publishOffer",
+        method: "POST",
+        headers,
+      });
+      const { listingId } = expectShape(
+        pubResp,
+        "ebay",
+        "publishOffer",
+        (j): j is { listingId: string } =>
+          typeof j === "object" && j !== null && typeof (j as Record<string, unknown>).listingId === "string",
+      );
 
       return {
         platform: this.platform,
@@ -251,7 +292,8 @@ export class EbayAdapter implements PlatformAdapter {
         listingUrl: `https://www.ebay.com/itm/${listingId}`,
       };
     } catch (err) {
-      return { platform: this.platform, ok: false, error: err instanceof Error ? err.message : String(err) };
+      const e = toAdapterError(err, "ebay", "publish");
+      return { platform: this.platform, ok: false, error: e.message, errorKind: e.kind };
     }
   }
 }

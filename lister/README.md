@@ -56,6 +56,35 @@ pnpm build             # production build
 pnpm package           # build distributable via electron-builder
 ```
 
+## Error handling & API-drift detection
+
+The session-based adapters depend on marketplace endpoints we don't control, so
+every failure is **classified** rather than surfaced as a raw message. The
+`request()` / `expectShape()` helpers in `platforms/apiClient.ts` turn failures
+into one of these kinds (`shared/types.ts`):
+
+| Kind | Meaning | Who fixes it |
+| --- | --- | --- |
+| `not_connected` / `auth_expired` | No/expired session or token | User reconnects |
+| `network` | Request never completed | User retries |
+| `rate_limited` / `platform_unavailable` | 429 / 5xx — transient | Wait and retry |
+| `platform_rejected` | Listing refused (4xx) | Fix the listing |
+| `api_changed` | **Endpoint gone (404/410) or response shape no longer matches** | **Adapter needs an update** |
+
+`api_changed` is the signal that a platform changed its API. It fires on two
+triggers: a 404/410 on an endpoint we expect to exist, and — more importantly —
+a `2xx` response whose body no longer contains the fields the adapter reads
+(`expectShape` catches this silent drift). When it happens:
+
+- The UI shows a distinct banner ("A marketplace changed its API") instead of a
+  generic error, with a button to open the diagnostics log.
+- The failure is appended to `diagnostics.log` (in the app's user-data dir) with
+  the endpoint label, HTTP status and a response snippet — **never** cookies,
+  tokens or request headers. In `pnpm dev` it also prints to the console.
+
+So when an adapter breaks, you can tell *which* endpoint changed and *how* the
+response differed, instead of guessing from a "publish failed" message.
+
 ## Integration seams
 
 Some live calls require real accounts and finalized endpoint details. These are

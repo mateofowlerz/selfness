@@ -66,6 +66,35 @@ export interface ConnectionStatus {
   detail?: string;
 }
 
+// Classified failure causes, so the UI (and we, debugging a user report) can
+// tell "your session expired" apart from "the platform changed its API and the
+// adapter needs an update".
+export type ErrorKind =
+  | "not_connected" // no session/token for this platform
+  | "auth_expired" // had credentials, platform no longer accepts them
+  | "network" // request never completed (offline, DNS, timeout)
+  | "rate_limited" // HTTP 429
+  | "platform_unavailable" // HTTP 5xx — transient on the platform's side
+  | "platform_rejected" // platform understood us but refused the listing (4xx)
+  | "api_changed" // endpoint gone or response shape no longer matches: adapter needs a fix
+  | "validation" // our own pre-flight validation failed
+  | "unknown";
+
+export const ERROR_KIND_LABELS: Record<ErrorKind, string> = {
+  not_connected: "Not connected",
+  auth_expired: "Session expired — reconnect",
+  network: "Network problem — try again",
+  rate_limited: "Rate limited — wait and retry",
+  platform_unavailable: "Platform is down — try later",
+  platform_rejected: "Listing rejected by platform",
+  api_changed: "Platform API changed — Lister needs an update",
+  validation: "Listing is incomplete",
+  unknown: "Unexpected error",
+};
+
+// Kinds the user can fix themselves; everything else is on us or the platform.
+export const USER_FIXABLE_KINDS: ErrorKind[] = ["not_connected", "auth_expired", "network", "validation"];
+
 export interface PublishResult {
   platform: Platform;
   ok: boolean;
@@ -73,6 +102,7 @@ export interface PublishResult {
   listingUrl?: string;
   listingId?: string;
   error?: string;
+  errorKind?: ErrorKind;
 }
 
 // Validation helper shared by renderer and main.
