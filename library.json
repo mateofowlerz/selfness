@@ -70,5 +70,77 @@
     "quarter": "Q2",
     "year": 2026,
     "url": "https://www.penguinrandomhouse.com/books/296832/atlas-shrugged-by-ayn-rand/"
+  },
+  {
+    "id": "capitalist-realism",
+    "title": "Capitalist Realism: Is There No Alternative?",
+    "author": "Mark Fisher",
+    "image": "/images/book-capitalist-realism.jpg",
+    "quarter": "Q3",
+    "year": 2026,
+    "url": "https://www.johnhuntpublishing.com/zer0-books/our-books/capitalist-realism"
+  },
+  {
+    "id": "the-communist-manifesto",
+    "title": "The Communist Manifesto",
+    "author": "Karl Marx & Friedrich Engels",
+    "image": "/images/book-communist-manifesto.jpg",
+    "quarter": "Q3",
+    "year": 2026,
+    "url": "https://www.penguin.co.uk/books/56718/the-communist-manifesto-by-karl-marx-and-friedrich-engels/9780140447576"
+  },
+  {
+    "id": "build-a-large-language-model-from-scratch",
+    "title": "Build a Large Language Model (From Scratch)",
+    "author": "Sebastian Raschka",
+    "image": "/images/book-build-llm-from-scratch.jpg",
+    "quarter": "Q3",
+    "year": 2026,
+    "url": "https://www.manning.com/books/build-a-large-language-model-from-scratch"
+  },
+  {
+    "id": "designing-data-intensive-applications",
+    "title": "Designing Data-Intensive Applications",
+    "author": "Martin Kleppmann",
+    "image": "/images/book-ddia.jpg",
+    "quarter": "Q3",
+    "year": 2026,
+    "url": "https://dataintensive.net/"
+  },
+  {
+    "id": "nausea",
+    "title": "Nausea",
+    "author": "Jean-Paul Sartre",
+    "image": "/images/book-nausea.jpg",
+    "quarter": "Q3",
+    "year": 2026,
+    "url": "https://www.ndbooks.com/book/nausea/"
+  },
+  {
+    "id": "the-trial",
+    "title": "The Trial",
+    "author": "Franz Kafka",
+    "image": "/images/book-the-trial.jpg",
+    "quarter": "Q3",
+    "year": 2026,
+    "url": "https://www.penguinrandomhouse.com/books/61356/the-trial-by-franz-kafka/"
+  },
+  {
+    "id": "the-stranger",
+    "title": "The Stranger",
+    "author": "Albert Camus",
+    "image": "/images/book-the-stranger.jpg",
+    "quarter": "Q3",
+    "year": 2026,
+    "url": "https://www.penguinrandomhouse.com/books/70570/the-stranger-by-albert-camus/"
+  },
+  {
+    "id": "the-plague",
+    "title": "The Plague",
+    "author": "Albert Camus",
+    "image": "/images/book-the-plague.jpg",
+    "quarter": "Q3",
+    "year": 2026,
+    "url": "https://www.penguinrandomhouse.com/books/70565/the-plague-by-albert-camus/"
   }
 ]
