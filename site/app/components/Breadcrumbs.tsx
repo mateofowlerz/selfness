@@ -12,9 +12,7 @@ const LABEL_MAP: Record<string, string> = {
 
 function toLabel(segment: string): string {
   if (LABEL_MAP[segment]) return LABEL_MAP[segment];
-  return segment
-    .replace(/-/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+  return segment.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 export default function Breadcrumbs() {

@@ -41,9 +41,7 @@ export default function LibraryPage() {
                     <p className="text-xs sm:text-sm font-medium uppercase text-black/40 italic line-clamp-1">
                       {book.author}
                     </p>
-                    <p className="text-xs sm:text-sm font-medium uppercase text-black line-clamp-1">
-                      {book.title}
-                    </p>
+                    <p className="text-xs sm:text-sm font-medium uppercase text-black line-clamp-1">{book.title}</p>
                   </div>
                 </Wrapper>
               );
