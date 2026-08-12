@@ -1,0 +1,11 @@
+# macOS
+.DS_Store
+
+# local scratch / not part of the site
+codesignal-prep/
+anthropic-codesignal-prep.md
+*.epub
+tmp/
+
+# env
+.env*
