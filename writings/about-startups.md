@@ -15,7 +15,7 @@ it's been 6 years where my content consumption consists 80% of startups-related 
 6. competition is for losers ([thiel](https://www.wsj.com/articles/peter-thiel-competition-is-for-losers-1410535536), obv)
 7. work a lot
 8. have a correct vision of the future and go build it ([thiel](https://blakemasters.tumblr.com/post/23435743973/peter-thiels-cs183-startup-class-13-notes))
-9. focus on surviving (freddy vega?)
+9. focus on surviving
 10. make friends with the idea you'll work on this for 10+ years (at least) if everything goes well ([thiel](https://en.wikipedia.org/wiki/Zero_to_One))
 11. become obsessed with your problem
 12. talk more with your users
