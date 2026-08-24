@@ -24,3 +24,4 @@ it's been 6 years where my content consumption consists 80% of startups-related 
 14. aim to build up a technological moat. ([thiel](https://blakemasters.tumblr.com/post/21169325300/peter-thiels-cs183-startup-class-4-notes-essay))
 15. be extremely ambitious. ([pg](https://www.paulgraham.com/ambitious.html))
 16. work on things you're interested about
+17. founders have extreme traits and that's double edged
