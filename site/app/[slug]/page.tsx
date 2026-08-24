@@ -132,7 +132,8 @@ export default async function Writing({ params }: { params: Promise<{ slug: stri
             </a>
           ),
           ul: ({ children }) => <ul>{children}</ul>,
-          li: ({ children }) => <li>{children}</li>,
+          ol: ({ children }) => <ol className="mb-6 list-decimal pl-6 [&_ol]:mt-1 [&_ol]:mb-0">{children}</ol>,
+          li: ({ children }) => <li className="mb-1">{children}</li>,
         }}
       >
         {content}
