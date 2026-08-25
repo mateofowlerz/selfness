@@ -31,14 +31,14 @@ export default function RootLayout({
                 </div>
               </Link>
               <div className="text-base text-(--muted) leading-tight">
-                Co-founder at{" "}
+                Making AI great for creatives at{" "}
                 <a
-                  href="https://melian.com"
+                  href="https://www.krea.ai"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="backlink md:hover:text-primary-dark transition-colors"
                 >
-                  Melian
+                  Krea
                 </a>
               </div>
             </div>

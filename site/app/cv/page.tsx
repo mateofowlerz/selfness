@@ -80,18 +80,26 @@ export default function CV() {
       <section className="flex flex-col gap-4">
         <p>
           I'm self-taught. I started tinkering with computers when I installed Linux at 13 and never stopped. Did some
-          software engineering side gigs while I was learning to program until I started my own company at 17. Now I
-          left my company and I'm learning about AI-safety full time to solve the most important open questions of our
-          lifetime.
+          software engineering side gigs while I was learning to program until I started my own company at 17. I left my
+          company and now I'm making AI great for creatives at{" "}
+          <a
+            href="https://www.krea.ai"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold md:hover:text-primary-dark transition-colors"
+          >
+            Krea
+          </a>
+          .
         </p>
       </section>
 
       <p className="font-semibold">What I built</p>
       <section className="flex flex-col gap-4">
         <p>
-          At 17y I started <span className="font-semibold">Melian</span>, an AI-powered shopping platform. We gather all
-          products from all online stores into one single place, so when you search, you don't have to open thousands of
-          tabs. It's like a Pinterest for shopping.
+          At 17y I started <span className="font-semibold">Melian</span>, an AI-powered shopping platform. We gathered
+          all products from all online stores into one single place, so when you search, you don't have to open
+          thousands of tabs. It's like a Pinterest for shopping.
           <br />
           <br />
           By the end of 2024 we were the third most downloaded shopping app in Argentina, ahead of Amazon. We made it to
@@ -150,8 +158,8 @@ export default function CV() {
 
       <section className="flex flex-col gap-2">
         <p className="font-semibold">Get in touch</p>
-        <a href="mailto:mateozaratefw@gmail.com" className="md:hover:text-primary-dark transition-colors">
-          mateozaratefw@gmail.com
+        <a href="mailto:m@mateofowler.com" className="md:hover:text-primary-dark transition-colors">
+          m@mateofowler.com
         </a>
         <Link href="/" className="text-sm text-(--muted) md:hover:text-(--fg) transition-colors">
           ← back home

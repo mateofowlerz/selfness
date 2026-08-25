@@ -42,8 +42,16 @@ export default function Home() {
       <Section>
         <p className="font-semibold ">About</p>
         <p>
-          I co founded{"   "}
-          {"   "}
+          Making AI great for creatives at{" "}
+          <a
+            href="https://www.krea.ai"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="backlink md:hover:text-primary-dark transition-colors"
+          >
+            Krea
+          </a>
+          . Previously I co founded{" "}
           <a
             href="https://melian.com"
             target="_blank"
