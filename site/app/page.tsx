@@ -66,18 +66,6 @@ export default function Home() {
       <Section>
         <MediaSection items={media} />
       </Section>
-      <Section>
-        <Link href="/cv" className="flex justify-between items-center">
-          <span className="font-semibold md:hover:text-primary-dark transition-colors">CV</span>
-          <span className="text-(--muted)">→</span>
-        </Link>
-      </Section>
-      <Section>
-        <Link href="/products" className="flex justify-between items-center">
-          <span className="font-semibold md:hover:text-primary-dark transition-colors">Wishlist</span>
-          <span className="text-(--muted)">→</span>
-        </Link>
-      </Section>
       {writings.length > 0 ? (
         <Section>
           <p className="font-semibold">Writing</p>
@@ -92,6 +80,18 @@ export default function Home() {
         </Section>
       ) : null}
       <Section>
+        <Link href="/cv" className="flex justify-between items-center">
+          <span className="font-semibold md:hover:text-primary-dark transition-colors">CV</span>
+          <span className="text-(--muted)">→</span>
+        </Link>
+      </Section>
+      <Section>
+        <Link href="/products" className="flex justify-between items-center">
+          <span className="font-semibold md:hover:text-primary-dark transition-colors">Wishlist</span>
+          <span className="text-(--muted)">→</span>
+        </Link>
+      </Section>
+      <Section>
         <Link href="/library" className="flex justify-between items-center">
           <span className="font-semibold md:hover:text-primary-dark transition-colors">Library</span>
           <span className="text-(--muted)">→</span>
@@ -103,12 +103,14 @@ export default function Home() {
           <span className="text-(--muted)">→</span>
         </Link>
       </Section>
-      <Section>
-        <Link href="/trip" className="flex justify-between items-center">
-          <span className="font-semibold md:hover:text-primary-dark transition-colors">Europe — June 2026</span>
-          <span className="text-(--muted)">→</span>
-        </Link>
-      </Section>
+      {process.env.VERCEL_ENV !== "production" ? (
+        <Section>
+          <Link href="/trip" className="flex justify-between items-center">
+            <span className="font-semibold md:hover:text-primary-dark transition-colors">Europe — June 2026</span>
+            <span className="text-(--muted)">→</span>
+          </Link>
+        </Section>
+      ) : null}
     </main>
   );
 }
