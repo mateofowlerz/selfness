@@ -64,15 +64,27 @@ export default function CV() {
   return (
     <main className="flex flex-col gap-12">
       <section className="flex flex-col gap-6">
-        <div className="relative w-40 aspect-[4/3] overflow-hidden">
-          <Image
-            src="/images/mateo.png"
-            alt="Mateo Fowler"
-            width={1024}
-            height={768}
-            className="h-full w-full object-cover"
-            priority
-          />
+        <div className="flex gap-4">
+          <div className="relative w-40 aspect-[4/3] overflow-hidden">
+            <Image
+              src="/images/mateo.png"
+              alt="Mateo Fowler"
+              width={1024}
+              height={768}
+              className="h-full w-full object-cover"
+              priority
+            />
+          </div>
+          <div className="relative w-40 aspect-[4/3] overflow-hidden">
+            <Image
+              src="/images/me-bald.png"
+              alt="Mateo Fowler, bald"
+              width={2364}
+              height={1778}
+              className="h-full w-full object-cover"
+              priority
+            />
+          </div>
         </div>
       </section>
 
