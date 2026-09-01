@@ -88,6 +88,10 @@ export function getAllWritings(): Writing[] {
     .map(({ content: _content, hidden: _hidden, ...writing }) => writing);
 }
 
+export function stripFrontmatter(content: string): string {
+  return content.replace(/^---\n[\s\S]*?\n---\n/, "");
+}
+
 export function getWritingBySlug(slug: string): WritingDocument | null {
   const filePath = path.join(WRITINGS_DIR, `${slug}.md`);
 

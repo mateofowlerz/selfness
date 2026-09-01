@@ -6,8 +6,10 @@ import React from "react";
 import Markdown from "react-markdown";
 import ImageGallery from "../components/ImageGallery";
 import ImageLink from "../components/ImageLink";
+import InlineEditor from "../components/InlineEditor";
 import MusicPlayer from "../components/MusicPlayer";
-import { getVisibleWritingSlugs, getWritingBySlug } from "../lib/writings";
+import Sidenote, { NoteBody } from "../components/Sidenote";
+import { getVisibleWritingSlugs, getWritingBySlug, stripFrontmatter } from "../lib/writings";
 
 const SUPPORTED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg", ".avif"];
 
@@ -48,8 +50,49 @@ export async function generateStaticParams() {
   return getVisibleWritingSlugs().map((slug) => ({ slug }));
 }
 
-function stripFrontmatter(content: string) {
-  return content.replace(/^---\n[\s\S]*?\n---\n/, "");
+type MarkdownNode = { position?: { start: { offset?: number }; end: { offset?: number } } };
+
+// lets the inline editor map a DOM selection back to a range in the markdown file
+function sourceRange(node?: MarkdownNode): string | undefined {
+  const start = node?.position?.start.offset;
+  const end = node?.position?.end.offset;
+
+  return start === undefined || end === undefined ? undefined : `${start}:${end}`;
+}
+
+function extractFootnotes(content: string): { body: string; notes: Map<string, string> } {
+  const notes = new Map<string, string>();
+
+  const body = content.replace(/^\[\^([^\]]+)\]:[ \t]*(.+)$/gm, (_match, id: string, text: string) => {
+    notes.set(id, text.trim());
+    return "";
+  });
+
+  return { body: body.trimEnd(), notes };
+}
+
+function processFootnotes(children: React.ReactNode, notes: Map<string, string>): React.ReactNode {
+  if (notes.size === 0) {
+    return children;
+  }
+
+  const result: React.ReactNode[] = [];
+
+  for (const [index, child] of React.Children.toArray(children).entries()) {
+    if (typeof child !== "string") {
+      result.push(child);
+      continue;
+    }
+
+    // odd indexes are the captured footnote ids, even ones the surrounding text
+    for (const [partIndex, part] of child.split(/\[\^([^\]]+)\]/).entries()) {
+      result.push(
+        partIndex % 2 === 1 ? <Sidenote key={`fn-${index}-${part}`} id={part} text={notes.get(part) ?? ""} /> : part,
+      );
+    }
+  }
+
+  return result;
 }
 
 function processMusicLinks(children: React.ReactNode): React.ReactNode {
@@ -97,15 +140,19 @@ export default async function Writing({ params }: { params: Promise<{ slug: stri
     notFound();
   }
 
-  const content = stripFrontmatter(writing.content);
+  const { body, notes } = extractFootnotes(stripFrontmatter(writing.content));
 
   return (
     <main>
       <Markdown
         components={{
-          h1: ({ children }) => <h1>{children}</h1>,
-          h2: ({ children }) => <h2>{children}</h2>,
-          p: ({ children }) => <p className="mb-6">{processMusicLinks(children)}</p>,
+          h1: ({ children, node }) => <h1 data-src={sourceRange(node)}>{children}</h1>,
+          h2: ({ children, node }) => <h2 data-src={sourceRange(node)}>{children}</h2>,
+          p: ({ children, node }) => (
+            <p className="mb-6" data-src={sourceRange(node)}>
+              {processFootnotes(processMusicLinks(children), notes)}
+            </p>
+          ),
           strong: ({ children }) => <strong>{children}</strong>,
           em: ({ children }) => <em>{children}</em>,
           img: ({ src, alt }) => {
@@ -131,13 +178,33 @@ export default async function Writing({ params }: { params: Promise<{ slug: stri
               {children}
             </a>
           ),
+          blockquote: ({ children }) => (
+            <blockquote className="mb-6 border-l-[3px] border-(--muted)/30 pl-4 [&>p]:mb-0 [&>p+p]:mt-4">
+              {children}
+            </blockquote>
+          ),
+          hr: () => <hr className="mt-4 mb-10 border-0 border-t border-muted/20" />,
           ul: ({ children }) => <ul>{children}</ul>,
           ol: ({ children }) => <ol className="mb-6 list-decimal pl-6 [&_ol]:mt-1 [&_ol]:mb-0">{children}</ol>,
-          li: ({ children }) => <li className="mb-1">{children}</li>,
+          li: ({ children, node }) => (
+            <li className="mb-1" data-src={sourceRange(node)}>
+              {processFootnotes(children, notes)}
+            </li>
+          ),
         }}
       >
-        {content}
+        {body}
       </Markdown>
+      {process.env.NODE_ENV === "production" ? null : <InlineEditor slug={slug} source={body} />}
+      {notes.size > 0 ? (
+        <ol className="mt-12 list-decimal border-t border-muted/10 pt-6 pl-5 text-sm text-(--muted) xl:hidden">
+          {[...notes].map(([id, text]) => (
+            <li key={id} id={`fn-${id}`} className="mb-2">
+              <NoteBody text={text} />
+            </li>
+          ))}
+        </ol>
+      ) : null}
     </main>
   );
 }
