@@ -63,9 +63,6 @@ export default function Home() {
           , a company that&apos;s building the best shopping experience ever made.
         </p>
       </Section>
-      <Section>
-        <MediaSection items={media} />
-      </Section>
       {writings.length > 0 ? (
         <Section>
           <p className="font-semibold">Writing</p>
@@ -81,15 +78,12 @@ export default function Home() {
           </div>
         </Section>
       ) : null}
+      <Section className="mt-[74px] pb-[50px]">
+        <MediaSection items={media} />
+      </Section>
       <Section>
         <Link href="/cv" className="flex justify-between items-center">
           <span className="font-semibold md:hover:text-primary-dark transition-colors">CV</span>
-          <span className="text-(--muted)">→</span>
-        </Link>
-      </Section>
-      <Section>
-        <Link href="/vault" className="flex justify-between items-center">
-          <span className="font-semibold md:hover:text-primary-dark transition-colors">Vault</span>
           <span className="text-(--muted)">→</span>
         </Link>
       </Section>
