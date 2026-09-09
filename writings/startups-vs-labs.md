@@ -1,4 +1,5 @@
 ---
+description: The AI labs built this decade’s best products. The next wave could belong to startups.
 title: Startups vs Labs
 date: 2026-09-09
 ---

@@ -57,15 +57,40 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   if (!writing || writing.hidden) notFound();
 
+  const images =
+    slug === "startups-vs-labs"
+      ? [
+          {
+            url: "/og/startups-vs-labs-star-v1.png",
+            width: 1200,
+            height: 630,
+            alt: "Startups vs Labs — a red star breaking free from a fractured black block",
+            type: "image/png",
+          },
+        ]
+      : undefined;
+
   return {
     title: `${writing.title} — Mateo Fowler`,
+    description: writing.description,
+    alternates: { canonical: `/${slug}` },
     openGraph: {
       title: writing.title,
+      description: writing.description ?? undefined,
+      url: `/${slug}`,
+      siteName: "Mateo Fowler",
+      ...(images ? { images } : {}),
       type: "article",
       authors: ["Mateo Fowler"],
       ...(writing.date ? { publishedTime: writing.date } : {}),
     },
-    twitter: { card: "summary_large_image", title: writing.title },
+    twitter: {
+      card: "summary_large_image",
+      title: writing.title,
+      description: writing.description ?? undefined,
+      creator: "@mateofowlerz",
+      ...(images ? { images } : {}),
+    },
   };
 }
 

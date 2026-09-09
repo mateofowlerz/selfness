@@ -8,6 +8,7 @@ export type Writing = {
 };
 
 export type WritingDocument = Writing & {
+  description: string | null;
   content: string;
   hidden: boolean;
 };
@@ -86,6 +87,7 @@ function getAllWritingDocuments(): WritingDocument[] {
 
         return {
           content,
+          description: getFrontmatterField(frontmatter, "description"),
           date: getFrontmatterField(frontmatter, "date"),
           hidden: isWritingHidden(frontmatter),
           slug,
@@ -117,6 +119,7 @@ export function getWritingBySlug(slug: string): WritingDocument | null {
 
   return {
     content,
+    description: getFrontmatterField(frontmatter, "description"),
     date: getFrontmatterField(frontmatter, "date"),
     hidden: isWritingHidden(frontmatter),
     slug,
