@@ -24,7 +24,7 @@ export default function Breadcrumbs() {
   const segments = pathname.split("/").filter(Boolean);
 
   return (
-    <nav aria-label="Breadcrumb" className="md:hidden pt-4 text-sm text-(--muted)">
+    <nav aria-label="Breadcrumb" className="pt-4 text-sm text-(--muted)">
       <ol className="flex items-center gap-1">
         <li>
           <Link href="/" className="hover:text-(--fg) transition-colors">
