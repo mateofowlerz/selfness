@@ -3,7 +3,6 @@ import { join } from "node:path";
 import { notFound } from "next/navigation";
 import { ImageResponse } from "next/og";
 import type { ReactNode } from "react";
-import BreakawayMark from "../components/BreakawayMark";
 import { formatWritingDate, getWritingBySlug } from "../lib/writings";
 
 export const alt = "An essay by Mateo Fowler";
@@ -22,6 +21,9 @@ export default async function BlogImage({ params }: { params: Promise<{ slug: st
   const isStartupsEssay = slug === "startups-vs-labs";
 
   const font = await readFile(join(process.cwd(), "public/fonts/PublicSans-Medium-OG.ttf"));
+  const starMark = isStartupsEssay
+    ? `data:image/png;base64,${(await readFile(join(process.cwd(), "public/marks/startups-vs-labs-star.png"))).toString("base64")}`
+    : null;
   const titleSize =
     writing.title.length > 80 ? "text-[52px]" : writing.title.length > 45 ? "text-[64px]" : "text-[78px]";
   const date = writing.date ? formatWritingDate(writing.date) : "An essay by Mateo Fowler";
@@ -48,8 +50,11 @@ export default async function BlogImage({ params }: { params: Promise<{ slug: st
             <Box className={`flex ${titleSize} leading-[1.06] tracking-[-4px]`}>{writing.title}</Box>
           </Box>
         )}
-        {isStartupsEssay ? (
-          <BreakawayMark />
+        {starMark ? (
+          // Satori cannot render next/image client components; embed the PNG in SVG.
+          <svg width="400" height="400" viewBox="0 0 400 400" aria-hidden="true">
+            <image href={starMark} width="400" height="400" />
+          </svg>
         ) : (
           <Box className="relative flex h-[340px] w-[340px] items-center justify-center overflow-hidden bg-[#d42a60]">
             <svg width="340" height="340" viewBox="0 0 340 340" fill="none" aria-hidden="true">
