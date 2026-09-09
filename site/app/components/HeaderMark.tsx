@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import BreakawayMark from "./BreakawayMark";
@@ -112,6 +113,19 @@ export default function HeaderMark() {
       reducedMotion.removeEventListener("change", play);
     };
   }, [pathname]);
+
+  if (pathname === "/") {
+    return (
+      <Image
+        src="/portraits/mateo-stencil-detailed.png"
+        alt="Stencil portrait of Mateo wearing a beret with a red star"
+        width={1254}
+        height={1254}
+        sizes="(min-width: 640px) 96px, 80px"
+        className="h-auto w-20 shrink-0 mix-blend-multiply sm:w-24"
+      />
+    );
+  }
 
   if (pathname !== "/startups-vs-labs") return null;
 
