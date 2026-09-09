@@ -5,9 +5,16 @@ import "./globals.css";
 import AgeSuffix from "./components/AgeSuffix";
 import Breadcrumbs from "./components/Breadcrumbs";
 import ExportPdfButton from "./components/ExportPdfButton";
+import HeaderMark from "./components/HeaderMark";
 import MiniPlayer from "./components/MiniPlayer";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ??
+      (process.env.VERCEL_PROJECT_PRODUCTION_URL
+        ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+        : "http://localhost:3000"),
+  ),
   title: "Mateo Fowler",
 };
 
@@ -23,7 +30,7 @@ export default function RootLayout({
       <body>
         <div className="max-w-[640px] mx-auto px-4 sm:px-8">
           <header className="pt-8 flex items-start justify-between gap-4">
-            <div>
+            <div className="min-w-0">
               <Link href="/" className="block no-underline">
                 <div className="font-semibold text-base text-(--fg) leading-tight">
                   Mateo Fowler
@@ -41,10 +48,11 @@ export default function RootLayout({
                   Krea
                 </a>
               </div>
+              <Breadcrumbs />
             </div>
+            <HeaderMark />
             <ExportPdfButton />
           </header>
-          <Breadcrumbs />
           {children}
         </div>
         {modal}

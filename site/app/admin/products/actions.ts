@@ -70,7 +70,7 @@ export async function addProduct(formData: FormData) {
   products.unshift(newProduct);
   saveProducts(products);
 
-  revalidatePath("/products");
+  revalidatePath("/wishlist");
   revalidatePath("/admin/products");
 
   return { success: true, product: newProduct };
@@ -90,7 +90,7 @@ export async function deleteProduct(id: string) {
   const filtered = products.filter((p) => p.id !== id);
   saveProducts(filtered);
 
-  revalidatePath("/products");
+  revalidatePath("/wishlist");
   revalidatePath("/admin/products");
 
   return { success: true };

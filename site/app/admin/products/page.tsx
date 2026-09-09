@@ -35,7 +35,7 @@ export default function AdminProductsPage() {
           <p className="text-(--muted)">Add and manage your favorite things.</p>
         </div>
         <Link
-          href="/products"
+          href="/wishlist"
           className="text-sm text-(--muted) transition-colors duration-150 ease-out md:hover:text-(--fg)"
         >
           View page →

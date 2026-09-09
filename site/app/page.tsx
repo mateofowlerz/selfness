@@ -86,18 +86,6 @@ export default function Home() {
         </Link>
       </Section>
       <Section>
-        <Link href="/products" className="flex justify-between items-center">
-          <span className="font-semibold md:hover:text-primary-dark transition-colors">Wishlist</span>
-          <span className="text-(--muted)">→</span>
-        </Link>
-      </Section>
-      <Section>
-        <Link href="/library" className="flex justify-between items-center">
-          <span className="font-semibold md:hover:text-primary-dark transition-colors">Library</span>
-          <span className="text-(--muted)">→</span>
-        </Link>
-      </Section>
-      <Section>
         <Link href="/vault" className="flex justify-between items-center">
           <span className="font-semibold md:hover:text-primary-dark transition-colors">Vault</span>
           <span className="text-(--muted)">→</span>

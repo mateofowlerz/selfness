@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const LABEL_MAP: Record<string, string> = {
-  products: "Wishlist",
+  wishlist: "Wishlist",
   admin: "Admin",
   images: "Images",
   cv: "CV",

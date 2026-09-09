@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import React from "react";
@@ -48,6 +49,24 @@ function getGalleryImages(folderPath: string): { src: string; slug: string }[] |
 
 export async function generateStaticParams() {
   return getVisibleWritingSlugs().map((slug) => ({ slug }));
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const writing = getWritingBySlug(slug);
+
+  if (!writing || writing.hidden) notFound();
+
+  return {
+    title: `${writing.title} — Mateo Fowler`,
+    openGraph: {
+      title: writing.title,
+      type: "article",
+      authors: ["Mateo Fowler"],
+      ...(writing.date ? { publishedTime: writing.date } : {}),
+    },
+    twitter: { card: "summary_large_image", title: writing.title },
+  };
 }
 
 type MarkdownNode = { position?: { start: { offset?: number }; end: { offset?: number } } };
