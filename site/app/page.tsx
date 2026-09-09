@@ -87,14 +87,6 @@ export default function Home() {
           <span className="text-(--muted)">→</span>
         </Link>
       </Section>
-      {process.env.VERCEL_ENV !== "production" ? (
-        <Section>
-          <Link href="/trip" className="flex justify-between items-center">
-            <span className="font-semibold md:hover:text-primary-dark transition-colors">Europe — June 2026</span>
-            <span className="text-(--muted)">→</span>
-          </Link>
-        </Section>
-      ) : null}
     </main>
   );
 }
