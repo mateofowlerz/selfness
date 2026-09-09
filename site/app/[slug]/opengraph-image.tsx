@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { ImageResponse } from "next/og";
 import type { ReactNode } from "react";
 import BreakawayMark from "../components/BreakawayMark";
-import { getWritingBySlug } from "../lib/writings";
+import { formatWritingDate, getWritingBySlug } from "../lib/writings";
 
 export const alt = "An essay by Mateo Fowler";
 export const size = { width: 1200, height: 630 };
@@ -24,14 +24,7 @@ export default async function BlogImage({ params }: { params: Promise<{ slug: st
   const font = await readFile(join(process.cwd(), "public/fonts/PublicSans-Medium-OG.ttf"));
   const titleSize =
     writing.title.length > 80 ? "text-[52px]" : writing.title.length > 45 ? "text-[64px]" : "text-[78px]";
-  const date = writing.date
-    ? new Date(`${writing.date}T12:00:00Z`).toLocaleDateString("en-US", {
-        month: "long",
-        day: "numeric",
-        year: "numeric",
-        timeZone: "UTC",
-      })
-    : "An essay by Mateo Fowler";
+  const date = writing.date ? formatWritingDate(writing.date) : "An essay by Mateo Fowler";
 
   return new ImageResponse(
     <Box className="flex h-full w-full flex-col bg-[#faf9f7] p-[48px] text-[#1a1a1a]">

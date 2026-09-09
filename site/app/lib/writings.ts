@@ -32,6 +32,19 @@ function getBooleanFrontmatterField(frontmatter: string | null, field: string): 
   return getFrontmatterField(frontmatter, field) === "true";
 }
 
+function isWritingHidden(frontmatter: string | null): boolean {
+  return (
+    getBooleanFrontmatterField(frontmatter, "hidden") ||
+    (getBooleanFrontmatterField(frontmatter, "localOnly") && process.env.NODE_ENV !== "development")
+  );
+}
+
+export function formatWritingDate(date: string): string {
+  return new Date(`${date}T12:00:00Z`)
+    .toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })
+    .replace(/^Sep /, "Sept ");
+}
+
 function formatFallbackTitle(slug: string) {
   return slug
     .split("-")
@@ -74,7 +87,7 @@ function getAllWritingDocuments(): WritingDocument[] {
         return {
           content,
           date: getFrontmatterField(frontmatter, "date"),
-          hidden: getBooleanFrontmatterField(frontmatter, "hidden"),
+          hidden: isWritingHidden(frontmatter),
           slug,
           title: getFrontmatterField(frontmatter, "title") ?? formatFallbackTitle(slug),
         } satisfies WritingDocument;
@@ -105,7 +118,7 @@ export function getWritingBySlug(slug: string): WritingDocument | null {
   return {
     content,
     date: getFrontmatterField(frontmatter, "date"),
-    hidden: getBooleanFrontmatterField(frontmatter, "hidden"),
+    hidden: isWritingHidden(frontmatter),
     slug,
     title: getFrontmatterField(frontmatter, "title") ?? formatFallbackTitle(slug),
   };

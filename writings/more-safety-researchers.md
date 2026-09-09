@@ -1,6 +1,7 @@
 ---
 title: We need more safety researchers
 date: 2026-08-30
+localOnly: true
 ---
 
 # We need more safety researchers

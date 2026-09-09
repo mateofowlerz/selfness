@@ -1,9 +1,9 @@
 ---
-title: About startups
+title: Repeated startup advice
 date: 2026-08-24
 ---
 
-# About startups
+# Repeated startup advice
 
 it's been 6 years where my content consumption consists 80% of startups-related content. these are some of the advice that constantly popups:
 

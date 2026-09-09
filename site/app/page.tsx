@@ -1,6 +1,6 @@
 import Link from "next/link";
 import MediaSection from "./components/MediaSection";
-import { getAllWritings } from "./lib/writings";
+import { formatWritingDate, getAllWritings } from "./lib/writings";
 
 const Section = ({ children, className = "pb-[50px]" }: { children: React.ReactNode; className?: string }) => {
   return <section className={`flex flex-col gap-2 ${className}`}>{children}</section>;
@@ -73,7 +73,9 @@ export default function Home() {
             {writings.map((writing) => (
               <Link key={writing.slug} href={`/${writing.slug}`} className="flex items-center justify-between gap-4">
                 <span className="md:hover:text-primary-dark transition-colors">{writing.title}</span>
-                <span className="text-sm text-(--muted)">{writing.date ?? "→"}</span>
+                <span className="shrink-0 whitespace-nowrap text-sm text-(--muted)">
+                  {writing.date ? <time dateTime={writing.date}>{formatWritingDate(writing.date)}</time> : "→"}
+                </span>
               </Link>
             ))}
           </div>
