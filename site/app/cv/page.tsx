@@ -93,7 +93,7 @@ export default function CV() {
         <p>
           I'm self-taught. I started tinkering with computers when I installed Linux at 13 and never stopped. Did some
           software engineering side gigs while I was learning to program until I started my own company at 17. I left my
-          company and now I'm making AI great for creatives at{" "}
+          company after scaling it for 3 years and now I'm making AI great for creatives at{" "}
           <a
             href="https://www.krea.ai"
             target="_blank"
