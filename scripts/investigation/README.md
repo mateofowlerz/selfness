@@ -99,8 +99,9 @@ localhost and exercises the cached-vector path, not the paid embeddings API.
 The writing is imported from Notion's HTML export to preserve rich text, not
 from accessibility/plain-text snapshots (which omit emphasis, highlights,
 dividers, and quote nesting). The website omits the Questions and Experiments
-sections at the author's request. Other wording is unchanged except website
-placeholder substitutions. METR and Kimi-trace placeholders await actual targets.
+sections and the standalone Investigation heading at the author's request.
+Other wording is unchanged except website placeholder substitutions. Message
+references link to the transcript; ranges open at their first message. METR and Kimi-trace placeholders await actual targets.
 
 The import preserves 45 bold spans, five italic spans, six colored highlights,
 five dividers, seven blockquotes (including a bulleted quotation), and the source

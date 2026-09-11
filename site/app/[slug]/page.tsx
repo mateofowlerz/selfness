@@ -226,9 +226,9 @@ export default async function Writing({ params }: { params: Promise<{ slug: stri
             // Preserve Notion's inline highlights without enabling raw HTML.
             const highlightClass =
               href === "#highlight-teal"
-                ? "bg-emerald-100 text-inherit"
+                ? "bg-emerald-300 text-inherit"
                 : href === "#highlight-blue"
-                  ? "bg-sky-100 text-inherit"
+                  ? "bg-sky-300 text-inherit"
                   : href === "#highlight-orange"
                     ? "bg-orange-100 text-inherit"
                     : null;
