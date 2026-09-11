@@ -68,7 +68,17 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
             type: "image/png",
           },
         ]
-      : undefined;
+      : slug === "anthropic-cybersecurity-investigation"
+        ? [
+            {
+              url: "/og/anthropic-cybersecurity-parcel-v1.png",
+              width: 1200,
+              height: 630,
+              alt: "Independent investigation of rogue Claude instance — a skull-marked parcel with a red ribbon",
+              type: "image/png",
+            },
+          ]
+        : undefined;
 
   return {
     title: `${writing.title} — Mateo Fowler`,
@@ -229,7 +239,7 @@ export default async function Writing({ params }: { params: Promise<{ slug: stri
             }
 
             return (
-              <a href={href} className="text-primary underline hover:text-primary-dark">
+              <a href={href} className="wrap-break-word text-primary underline hover:text-primary-dark">
                 {children}
               </a>
             );

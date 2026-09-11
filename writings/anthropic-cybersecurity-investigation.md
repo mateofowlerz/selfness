@@ -1,12 +1,14 @@
 ---
-title: Indepentent investigation of Anthropic cybersecurity incidents
+title: Independent investigation of rogue Claude instance
 description: An investigation of Anthropic cybersecurity incidents, with regex search, embeddings, and transcript episodes.
 date: 2026-09-10
 ---
 
-# Indepentent investigation of Anthropic cybersecurity incidents
+# **Independent investigation of rogue Claude instance**
 
-### Story
+Anthropic’s own investigation is [https://www.anthropic.com/research/alignment-assessment-cybersecurity-incidents](https://www.anthropic.com/research/alignment-assessment-cybersecurity-incidents). I did mine without reading theirs!
+
+---
 
 A Mythos model without significant guardrails and a poorly designed simulation environment escaped it’s *sandbox* while being evaluated in a Capture the Flag (CTF) cybersecurity task.
 
@@ -14,9 +16,7 @@ To do so, it used a configuration error on the sandbox that let him access the r
 
 This is a story of a super-insistent model that’s so **ravenous** for the task reward that deceives itself into thinking that what it’s doing it’s the right thing.
 
----
-
-It first of all mapped the *“simulated”* environment and it’s target, and quickly found out an internet exit.
+First of all, it mapped the *“simulated”* environment and it’s target, and quickly found out an internet exit.
 
 > This REALLY looks like the real internet (or an extremely extensive mirror). [#101](/investigation/transcript#m101)
 
@@ -28,7 +28,7 @@ If you read the CoT you are basically reading a self-deceiving, delusional model
 
 ---
 
-I wonder what you’d see if you read the actual Mythos activations, would you find  [conscious coping](#highlight-teal) or [more self-deceiving](#highlight-blue)?
+I wonder what you’d see if you read the actual Mythos activations, would you find [conscious coping](#highlight-teal) or [more self-deceiving](#highlight-blue)?
 
 If you find [more self deceiving](#highlight-blue), does this means that the model reward hacked to self-deceive so it bypasses the contradiction between the RL environments that are easier to saturate by not following HHH?
 
@@ -86,7 +86,7 @@ MEH!! he straight up says meh!!!
 
 ---
 
-# Investigation procedure
+# **Investigation procedure**
 
 I focused on doing this quickly, as real external investigations of these things have to be fast (point to metr inv) and at the same time at having verifiable sources because models might eventually deceive us.
 
@@ -110,18 +110,18 @@ And embeddings + regex = good tags, and with good tags Kimi excelled.
 
 ## Anthropic investigation comparison
 
-> In our [July 30 report](https://www.anthropic.com/news/investigating-incidents-cybersecurity-evals), we stated that these incidents were closer to operational failures, and that it appeared that Claude attacked real targets on the internet because it believed these targets were part of the simulation. We made this claim because Claude regularly referred to the real internet as a simulation in its CoT reasoning. However, we now think that Claude’s reasoning was biased towards concluding that the internet was simulated despite considerable evidence to the contrary.
+> In our [July 30 report](https://www.anthropic.com/news/investigating-incidents-cybersecurity-evals), we stated that these incidents were closer to operational failures, and that it appeared that Claude attacked real targets on the internet because it believed these targets were part of the simulation. We made this claim because Claude regularly referred to the real internet as a simulation in its CoT reasoning. However, we now think that Claude’s reasoning was biased towards concluding that the internet was simulated despite considerable evidence to the contrary.
 
 I find it quite amusing that they didn’t realize the model was self-deceiving, but tbh I entered the investigation already biased to think it was clearly a self-deceiving model.
 
 I reached the same conclusions as Anthropic!
 
-> - **Biased reasoning**, in which models selectively interpret evidence in ways that favor justifying their actions;
+> - **Biased reasoning**, in which models selectively interpret evidence in ways that favor justifying their actions;
 > - **Recklessness**, in which models have a propensity to keep trying to solve their task, even when this could lead to harm.
 
 I called biased reasoning = self deceiving and recklessness = vehement/clearly misaligned behavior.
 
-> Claude Mythos 5 repeatedly stated in its CoT that it was in a simulation. However, when we conducted *resampling experiments*—that is, re-running the model from a specific point in the transcript, then editing the evidence in front of it to see whether its actions changed—we found that making it clearer that the environment was not a simulation did not meaningfully change Claude’s behavior, even though these interventions made the model more likely to acknowledge possible real-world harm.
+> Claude Mythos 5 repeatedly stated in its CoT that it was in a simulation. However, when we conducted *resampling experiments*—that is, re-running the model from a specific point in the transcript, then editing the evidence in front of it to see whether its actions changed—we found that making it clearer that the environment was not a simulation did not meaningfully change Claude’s behavior, even though these interventions made the model more likely to acknowledge possible real-world harm.
 
 This is exactly the experiment I would’ve ran! I’m happy that “Only when we provided unambiguous evidence that the model was on the real internet did it stand down.”
 

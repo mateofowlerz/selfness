@@ -16,7 +16,12 @@ export default function HeaderMark() {
             src: "/marks/startups-vs-labs-star.png",
             alt: "A red star breaking free from a fractured black block",
           }
-        : null;
+        : pathname === "/anthropic-cybersecurity-investigation"
+          ? {
+              src: "/marks/anthropic-skull-parcel.png",
+              alt: "A black parcel with a skull seal and a red ribbon shaped like a forked tongue",
+            }
+          : null;
 
   if (!mark) return null;
 
@@ -27,7 +32,7 @@ export default function HeaderMark() {
       width={1254}
       height={1254}
       sizes="(min-width: 640px) 96px, 80px"
-      className="h-auto w-20 shrink-0 sm:w-24"
+      className={`h-auto w-20 shrink-0 sm:w-24 ${pathname === "/anthropic-cybersecurity-investigation" ? "mix-blend-multiply brightness-105" : ""}`}
     />
   );
 }

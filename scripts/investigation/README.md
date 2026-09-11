@@ -96,15 +96,14 @@ For a production HTTP smoke check, start the built server with no API key as sho
 in `smoke.py`, then run `python3 scripts/investigation/smoke.py`. It only contacts
 localhost and exercises the cached-vector path, not the paid embeddings API.
 
-The writing is imported from Notion's HTML export to preserve rich text, not
-from accessibility/plain-text snapshots (which omit emphasis, highlights,
-dividers, and quote nesting). The website omits the Questions and Experiments
-sections and the standalone Investigation heading at the author's request.
-Other wording is unchanged except website placeholder substitutions. Message
-references link to the transcript; ranges open at their first message. METR and Kimi-trace placeholders await actual targets.
+The writing is imported from Notion's HTML export to preserve rich text.
+The current source is the final pasted revision beginning "Independent
+investigation of rogue Claude instance", rather than the earlier duplicate.
+The wording is unchanged; grammar suggestions are kept outside the published
+article pending the author's approval. Existing transcript links, rose highlights,
+and quoted-list structure are preserved after Notion's browser-copy round trip.
+Local site URLs remain relative. METR and Kimi-trace placeholders await targets.
 
-The import preserves 45 bold spans, five italic spans, six colored highlights,
-five dividers, seven blockquotes (including a bulleted quotation), and the source
-heading levels. Markdown links with destinations `#highlight-teal`,
-`#highlight-blue`, and `#highlight-orange` render as semantic `mark` elements;
-this keeps the source editable without enabling raw HTML in writings.
+The skull-parcel mark was produced with Krea from approved option C. It appears
+in the article header and the static 1200x630 social image. The dynamic Open Graph
+route uses the same artwork. Other Mythos symbols remain proposals, not deployed.

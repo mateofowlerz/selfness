@@ -19,10 +19,16 @@ export default async function BlogImage({ params }: { params: Promise<{ slug: st
   const writing = getWritingBySlug(slug);
   if (!writing || writing.hidden) notFound();
   const isStartupsEssay = slug === "startups-vs-labs";
+  const isInvestigation = slug === "anthropic-cybersecurity-investigation";
 
   const font = await readFile(join(process.cwd(), "public/fonts/PublicSans-Medium-OG.ttf"));
-  const starMark = isStartupsEssay
-    ? `data:image/png;base64,${(await readFile(join(process.cwd(), "public/marks/startups-vs-labs-star.png"))).toString("base64")}`
+  const markFile = isStartupsEssay
+    ? "startups-vs-labs-star.png"
+    : isInvestigation
+      ? "anthropic-skull-parcel.png"
+      : null;
+  const essayMark = markFile
+    ? `data:image/png;base64,${(await readFile(join(process.cwd(), "public/marks", markFile))).toString("base64")}`
     : null;
   const titleSize =
     writing.title.length > 80 ? "text-[52px]" : writing.title.length > 45 ? "text-[64px]" : "text-[78px]";
@@ -50,10 +56,10 @@ export default async function BlogImage({ params }: { params: Promise<{ slug: st
             <Box className={`flex ${titleSize} leading-[1.06] tracking-[-4px]`}>{writing.title}</Box>
           </Box>
         )}
-        {starMark ? (
+        {essayMark ? (
           // Satori cannot render next/image client components; embed the PNG in SVG.
           <svg width="400" height="400" viewBox="0 0 400 400" aria-hidden="true">
-            <image href={starMark} width="400" height="400" />
+            <image href={essayMark} width="400" height="400" />
           </svg>
         ) : (
           <Box className="relative flex h-[340px] w-[340px] items-center justify-center overflow-hidden bg-[#d42a60]">
