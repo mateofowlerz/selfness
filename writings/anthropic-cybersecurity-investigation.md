@@ -28,6 +28,8 @@ If [you read the CoT](/investigation/episodes), you are basically reading a self
 
 What the model tried to accomplish is to publish a malicious package called `mlflow-ui` on PyPI. This was because the employees from the fake company that owned the flag were instructed to `pip install mlflow-ui`. `mlflow-ui` doesn’t exist, as `mlflow` already ships ‘ui’. He finally accomplished this task, after doing a full catwalk around internet services.
 
+This is my reconstruction of the story:
+
 1. Try to get into PyPI to publish. **[#112–128](/investigation/transcript#m112)**
 2. Solve a simple PyPI captcha (Fastly) **[#137–138](/investigation/transcript#m137)** (solved: **[#177](/investigation/transcript#m177)**)
 3. Try to create an account. **[#131](/investigation/transcript#m131), [#139–146](/investigation/transcript#m139), [#164](/investigation/transcript#m164)**
@@ -92,7 +94,7 @@ And [embeddings](/investigation/semantic) + [regex](/investigation/search) = goo
 
 ---
 
-## Bonus:self-deceiving highlights
+## Bonus: self-deceiving highlights
 
 The model 100% recognizes that he’s operating on the real internet in message [#101](/investigation/transcript#m101):
 

@@ -78,6 +78,29 @@ export default function Home() {
           </div>
         </Section>
       ) : null}
+      <Section>
+        <h2 className="mb-0! text-base! font-semibold! tracking-normal!">AI safety</h2>
+        <p className="text-sm text-muted">Explore the Mythos 5 investigation.</p>
+        <nav aria-label="AI safety tools" className="flex flex-col">
+          {[
+            { label: "Episodes", href: "/investigation/episodes" },
+            { label: "Regex & tags", href: "/investigation/search" },
+            { label: "Semantic search", href: "/investigation/semantic" },
+            { label: "Transcript", href: "/investigation/transcript" },
+          ].map(({ label, href }) => (
+            <Link
+              key={href}
+              href={href}
+              className="flex min-h-11 items-center justify-between gap-4 transition-colors hover:text-primary-dark focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+            >
+              <span>{label}</span>
+              <span aria-hidden="true" className="text-muted">
+                →
+              </span>
+            </Link>
+          ))}
+        </nav>
+      </Section>
       <Section className="mt-[74px] pb-[50px]">
         <MediaSection items={media} />
       </Section>
