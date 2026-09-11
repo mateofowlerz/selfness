@@ -96,8 +96,11 @@ For a production HTTP smoke check, start the built server with no API key as sho
 in `smoke.py`, then run `python3 scripts/investigation/smoke.py`. It only contacts
 localhost and exercises the cached-vector path, not the paid embeddings API.
 
-The imported Notion revision includes the twenty-step message citations and the
-later “Anthropic investigation comparison” section. Editorial adjustments fix
-grammar and distinguish the author’s training-mechanism hypothesis from what the
-released transcript establishes. Unresolved external-link placeholders (METR and
-the investigator’s Kimi traces) are omitted rather than turned into broken links.
+The writing preserves the original Notion wording, structure, quotations, and
+message references, including the latest interpretability paragraph. Only the
+website placeholders are replaced with links to the hosted tools. The METR and
+investigator Kimi-trace placeholders remain pending their actual targets; do not
+remove them or substitute the Mythos transcript for the investigator's traces.
+Browser verification compared all 90 Notion content blocks against the rendered
+article: the wording matches after the two website-placeholder substitutions and
+whitespace/inline-code formatting normalization.
