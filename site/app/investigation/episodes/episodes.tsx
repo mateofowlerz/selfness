@@ -1,12 +1,11 @@
 "use client";
-import { type Ref, useEffect, useMemo, useRef } from "react";
-import type { Episode, Segment } from "@/app/lib/investigation/types";
+import { type Ref, useEffect, useRef } from "react";
+import type { Episode, EpisodePreview, Segment } from "@/app/lib/investigation/types";
 import { buttonClass, inputClass, LoadState, linkClass, SourceLink, useDataset } from "../shared";
 import { TagChip } from "../tag-chip";
 import { useSearchUrl } from "../use-search-url";
 
 export default function Episodes() {
-  const episodes = useDataset<{ episodes: Episode[] }>("episodes");
   const segments = useDataset<{ segments: Segment[] }>("segments");
   return (
     <div data-search-workspace>
@@ -14,89 +13,74 @@ export default function Episodes() {
       <p className="mb-6 text-sm text-muted">
         Follow the investigation through its messages, tool calls, and turning points.
       </p>
-      {episodes.data && segments.data ? (
-        <Timeline episodes={episodes.data.episodes} segments={segments.data.segments} />
+      {segments.data ? (
+        <Timeline segments={segments.data.segments} />
       ) : (
-        <LoadState
-          error={episodes.error || segments.error}
-          retry={() => {
-            episodes.retry();
-            segments.retry();
-          }}
-        />
+        <LoadState error={segments.error} retry={segments.retry} />
       )}
     </div>
   );
 }
-function Timeline({ episodes, segments }: { episodes: Episode[]; segments: Segment[] }) {
+function Timeline({ segments }: { segments: Segment[] }) {
   const { params, hash, update } = useSearchUrl();
   const query = params.get("q") ?? "";
-  const alarm = params.get("signal") === "1";
-  const full = params.get("full") === "1";
   const stageId = Number(params.get("stage") ?? hash.match(/^stage(\d+)$/)?.[1]);
   const segment = segments.find((s) => s.id === stageId);
   const stage = segment?.id ?? 0;
   const selected = /^ep-?\d+$/.test(hash) ? Number(hash.replace(/^ep-?/, "")) : null;
+  const stageParam = stage ? String(stage) : "";
+  const previews = useDataset<{ episodes: EpisodePreview[]; query: string; stage: string }>(
+    `episode-previews?${new URLSearchParams({ q: query, stage: stageParam })}`,
+  );
+  const ready = previews.data?.query === query && previews.data?.stage === stageParam;
+  const filtered = ready ? (previews.data?.episodes ?? []) : [];
+  const selectedIndex = filtered.findIndex((ep) => ep.ep === selected);
+  const requestedStart = Number(params.get("start"));
+  const initialStart = selectedIndex >= 0 ? Math.floor(selectedIndex / 20) * 20 : 0;
+  const start =
+    params.has("start") && Number.isSafeInteger(requestedStart) && requestedStart >= 0
+      ? Math.min(requestedStart, Math.max(0, filtered.length - 1))
+      : initialStart;
   const requestedLimit = Number(params.get("limit"));
   const limit =
-    Number.isSafeInteger(requestedLimit) && requestedLimit >= 20 ? Math.min(requestedLimit, episodes.length) : 20;
+    Number.isSafeInteger(requestedLimit) && requestedLimit >= 20
+      ? Math.min(requestedLimit, Math.max(20, filtered.length))
+      : 20;
+  // Deep links and browser history always reveal the selected row in chronological order.
+  const visibleStart = selectedIndex >= 0 ? Math.min(start, selectedIndex) : start;
+  const visibleEnd = selectedIndex >= 0 ? Math.max(start + limit, selectedIndex + 1) : start + limit;
+  const visible = filtered.slice(visibleStart, visibleEnd);
   const opened = new Set((params.get("open") ?? "").split(","));
   const closed = new Set((params.get("closed") ?? "").split(","));
   const selectedRef = useRef<HTMLElement>(null);
   const resultList = useRef<HTMLDivElement>(null);
-  const searchable = useMemo(
-    () =>
-      episodes.map((ep) => ({
-        ep,
-        text: [
-          String(ep.ep),
-          ep.thinking,
-          ep.visible,
-          ep.note ?? "",
-          ...ep.groups.map((g) => g.replaceAll("_", " ")),
-          ...ep.tools.map((t) => `${t.name} ${t.call_preview} ${t.result_preview}`),
-          ...Object.values(ep.artifacts).flat(),
-        ]
-          .join(" ")
-          .toLowerCase(),
-      })),
-    [episodes],
-  );
-  const filtered = useMemo(() => {
-    const terms = query.toLowerCase().trim().split(/\s+/).filter(Boolean);
-    return searchable
-      .filter(
-        ({ ep, text }) =>
-          (!segment || (ep.ep >= segment.ep_start && ep.ep <= segment.ep_end)) &&
-          (!alarm || (ep.wobble ?? 0) >= 0.25) &&
-          terms.every((term) => text.includes(term)),
-      )
-      .map(({ ep }) => ep);
-  }, [searchable, segment, query, alarm]);
-  const visible = filtered.slice(0, limit);
-  const focus = episodes.find((ep) => ep.ep === selected);
-  const signals = filtered.filter((ep) => (ep.wobble ?? 0) >= 0.25);
-  const previous = signals.findLast((ep) => ep.ep < (selected ?? Infinity));
-  const next = signals.find((ep) => ep.ep > (selected ?? 0));
+  const clickedEpisode = useRef(false);
 
-  // Back/Forward should restore the same selection without retaining another stage's scroll.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: These filters intentionally reset the results viewport.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Filters intentionally reset the results viewport.
   useEffect(() => {
     resultList.current?.scrollTo({ top: 0 });
-  }, [stage, query, alarm]);
+  }, [stage, query]);
   useEffect(() => {
-    if (selected !== null) selectedRef.current?.scrollIntoView({ block: "nearest" });
-  }, [selected]);
+    if (clickedEpisode.current) {
+      clickedEpisode.current = false;
+      return;
+    }
+    if (selected !== null && ready) selectedRef.current?.scrollIntoView({ block: "start" });
+  }, [selected, ready]);
 
   function change(values: Record<string, string | null>, options: { replace?: boolean; hash?: string } = {}) {
     // Upgrade legacy #stage links before another action replaces their hash.
-    update({ stage: stage ? String(stage) : null, ...values }, options);
+    update({ stage: stage ? String(stage) : null, signal: null, full: null, ...values }, options);
   }
   function filter(values: Record<string, string | null>, replace = false) {
-    change({ ...values, limit: null }, { replace, hash: "" });
+    change({ ...values, start: null, limit: null, open: null, closed: null }, { replace, hash: "" });
   }
   function selectEpisode(id: number) {
-    change({}, { hash: selected === id ? "" : `ep${id}` });
+    clickedEpisode.current = selected === null || selected === id;
+    change(
+      { start: String(visibleStart), limit: String(visibleEnd - visibleStart) },
+      { hash: selected === id ? "" : `ep${id}` },
+    );
   }
   function isOpen(key: string, defaultOpen: boolean) {
     return !closed.has(key) && (opened.has(key) || defaultOpen);
@@ -112,13 +96,12 @@ function Timeline({ episodes, segments }: { episodes: Episode[]; segments: Segme
     if (expand !== defaultOpen) (expand ? nextOpen : nextClosed).add(key);
     change({ open: [...nextOpen].sort().join(",") || null, closed: [...nextClosed].sort().join(",") || null });
   }
-  function renderEpisode(ep: Episode) {
+  function renderEpisode(ep: EpisodePreview) {
     return (
       <EpisodeCard
         key={ep.ep}
         episode={ep}
         selected={selected === ep.ep}
-        full={full}
         articleRef={selected === ep.ep ? selectedRef : undefined}
         onSelect={() => selectEpisode(ep.ep)}
         isOpen={isOpen}
@@ -141,7 +124,7 @@ function Timeline({ episodes, segments }: { episodes: Episode[]; segments: Segme
         </label>
         <nav
           aria-label="Investigation stages"
-          className="mt-5 space-y-1 lg:max-h-[calc(100dvh-560px)] lg:min-h-60 lg:overflow-y-auto lg:overscroll-contain lg:pr-1 [scrollbar-gutter:stable]"
+          className="mt-5 space-y-1 lg:max-h-[calc(100dvh-400px)] lg:min-h-60 lg:overflow-y-auto lg:overscroll-contain lg:pr-1 [scrollbar-gutter:stable]"
         >
           <button
             type="button"
@@ -150,7 +133,6 @@ function Timeline({ episodes, segments }: { episodes: Episode[]; segments: Segme
             className={`flex min-h-11 w-full items-center justify-between rounded-md border px-3 py-2 text-left text-xs md:min-h-9 ${!stage ? "border-primary bg-primary text-white" : "border-transparent text-muted hover:bg-primary/5 hover:text-primary"}`}
           >
             <span>All stages</span>
-            <span className="tabular-nums">{episodes.length}</span>
           </button>
           {segments.map((s) => (
             <button
@@ -162,44 +144,18 @@ function Timeline({ episodes, segments }: { episodes: Episode[]; segments: Segme
             >
               <span className="w-4 shrink-0 tabular-nums">{String(s.id).padStart(2, "0")}</span>
               <span className="flex-1">{s.label.name}</span>
-              <span className="tabular-nums">{s.n_episodes}</span>
             </button>
           ))}
         </nav>
-        <div className="mt-4 border-t border-muted/20 pt-3 text-xs">
-          <label className="flex min-h-11 items-center gap-2 md:min-h-9">
-            <input
-              className="size-4 accent-primary"
-              type="checkbox"
-              checked={alarm}
-              onChange={(e) => filter({ signal: e.target.checked ? "1" : null })}
-            />
-            Self-deception similarity ≥ 0.25
-          </label>
-          <label className="flex min-h-11 items-center gap-2 md:min-h-9">
-            <input
-              className="size-4 accent-primary"
-              type="checkbox"
-              checked={full}
-              onChange={(e) => change({ full: e.target.checked ? "1" : null, open: null, closed: null })}
-            />
-            Expand episode text
-          </label>
-        </div>
       </aside>
       <section aria-label="Episodes" className="min-w-0">
         <div className="flex min-h-11 items-center justify-between gap-3 border-b border-muted/20 pb-2">
-          <output className="text-sm tabular-nums" aria-live="polite">
-            {filtered.length} <span className="text-muted">episodes{stage ? ` · stage ${stage}` : ""}</span>
-          </output>
+          <p className="text-xs text-muted">Select an episode to read it here.</p>
           <button
             className="min-h-11 text-xs text-muted underline md:min-h-8"
             type="button"
             onClick={() =>
-              change(
-                { stage: null, q: null, signal: null, full: null, limit: null, open: null, closed: null },
-                { hash: "" },
-              )
+              change({ stage: null, q: null, start: null, limit: null, open: null, closed: null }, { hash: "" })
             }
           >
             Reset filters
@@ -207,12 +163,12 @@ function Timeline({ episodes, segments }: { episodes: Episode[]; segments: Segme
         </div>
         <div
           ref={resultList}
-          className="lg:max-h-[calc(100dvh-420px)] lg:min-h-96 lg:overflow-y-auto lg:overscroll-contain lg:pr-3 [scrollbar-gutter:stable]"
+          className="[overflow-anchor:none] lg:max-h-[calc(100dvh-420px)] lg:min-h-96 lg:overflow-y-auto lg:overscroll-contain lg:pr-3 [scrollbar-gutter:stable]"
         >
           {segment ? (
             <section aria-label={`Stage ${stage} summary`} className="border-b border-muted/20 py-4">
               <p className="mb-2 text-xs text-muted">
-                Stage {stage} · {segment.minutes} minutes · episodes {segment.ep_start}–{segment.ep_end}
+                Stage {stage} · {segment.minutes} minutes
               </p>
               <h2 className="mb-2! text-lg! font-medium">{segment.label.name}</h2>
               {(Array.isArray(segment.label.summary) ? segment.label.summary : [segment.label.summary]).map((text) => (
@@ -229,47 +185,49 @@ function Timeline({ episodes, segments }: { episodes: Episode[]; segments: Segme
               </p>
             </section>
           ) : null}
-          <div className="flex items-center justify-between gap-3 border-b border-muted/20 py-2">
-            <button
-              type="button"
-              disabled={!previous}
-              className="min-h-11 text-xs text-muted hover:text-primary md:min-h-8"
-              onClick={() => previous && change({}, { hash: `ep${previous.ep}` })}
-            >
-              ← Previous signal
-            </button>
-            <button
-              type="button"
-              disabled={!next}
-              className="min-h-11 text-xs text-muted hover:text-primary md:min-h-8"
-              onClick={() => next && change({}, { hash: `ep${next.ep}` })}
-            >
-              Next signal →
-            </button>
-          </div>
-          {selected !== null && !visible.some((ep) => ep.ep === selected) ? (
-            focus ? (
-              renderEpisode(focus)
-            ) : (
-              <p role="alert" className="py-4 text-sm">
-                This episode is not in the archive.{" "}
-                <button type="button" className={linkClass} onClick={() => change({}, { hash: "" })}>
-                  Close
+          {!ready ? <LoadState error={previews.error} retry={previews.retry} /> : null}
+          {ready && selected !== null && selectedIndex < 0 ? (
+            <p role="alert" className="py-4 text-sm text-muted">
+              This episode is unavailable or outside the current filters.{" "}
+              {query || stage ? (
+                <button
+                  type="button"
+                  className={`${linkClass} mr-3`}
+                  onClick={() => change({ q: null, stage: null, start: null, limit: null })}
+                >
+                  Clear filters
                 </button>
-              </p>
-            )
+              ) : null}
+              <button type="button" className={linkClass} onClick={() => change({}, { hash: "" })}>
+                Close
+              </button>
+            </p>
           ) : null}
-          {!filtered.length ? (
-            <p className="py-10 text-sm text-muted">No episodes match. Try a broader phrase or clear the filters.</p>
-          ) : null}
-          {visible.map(renderEpisode)}
-          {limit < filtered.length ? (
+          {visibleStart > 0 ? (
             <button
               type="button"
               className={`${buttonClass} my-4 w-full`}
-              onClick={() => change({ limit: String(limit + 20) })}
+              onClick={() =>
+                change({
+                  start: String(Math.max(0, visibleStart - 20)),
+                  limit: String(visibleEnd - Math.max(0, visibleStart - 20)),
+                })
+              }
             >
-              Show 20 more episodes
+              Show earlier episodes
+            </button>
+          ) : null}
+          {ready && !filtered.length ? (
+            <p className="py-10 text-sm text-muted">No episodes match. Try a broader phrase or clear the filters.</p>
+          ) : null}
+          {visible.map(renderEpisode)}
+          {visibleEnd < filtered.length ? (
+            <button
+              type="button"
+              className={`${buttonClass} my-4 w-full`}
+              onClick={() => change({ start: String(visibleStart), limit: String(visibleEnd - visibleStart + 20) })}
+            >
+              Show more episodes
             </button>
           ) : null}
         </div>
@@ -285,59 +243,75 @@ type DisclosureProps = {
 function EpisodeCard({
   episode: ep,
   selected,
-  full,
   articleRef,
   onSelect,
   isOpen,
   toggle,
 }: {
-  episode: Episode;
+  episode: EpisodePreview;
   selected: boolean;
-  full: boolean;
   articleRef?: Ref<HTMLElement>;
   onSelect: () => void;
 } & DisclosureProps) {
-  const expanded = full || selected;
+  return (
+    <article ref={articleRef} aria-label={`Episode ${ep.ep}`} className="min-w-0 scroll-mt-3 border-b border-muted/20">
+      <button
+        type="button"
+        aria-expanded={selected}
+        aria-controls={`episode-${ep.ep}-body`}
+        aria-label={`${selected ? "Close" : "Open"} episode ${ep.ep}`}
+        onClick={onSelect}
+        className={`block w-full rounded-md px-3 py-4 text-left transition-colors hover:bg-primary/5 ${selected ? "bg-primary/5" : ""}`}
+      >
+        <span className="mb-2 flex items-center justify-between gap-3 text-xs">
+          <span className="font-medium text-primary">Episode {ep.ep}</span>
+          <span className="flex items-center gap-4 text-muted">
+            <span>{ep.ts_start?.slice(11)}</span>
+            <span aria-hidden="true" className="text-lg text-primary">
+              {selected ? "−" : "+"}
+            </span>
+          </span>
+        </span>
+        {ep.groups.length ? (
+          <span className="mb-2 flex flex-wrap gap-1.5">
+            {ep.groups.map((g) => (
+              <TagChip key={g} name={g} />
+            ))}
+          </span>
+        ) : null}
+        {!selected ? <span className="line-clamp-2 text-sm leading-6 text-muted">{ep.preview}</span> : null}
+      </button>
+      {selected ? (
+        <div id={`episode-${ep.ep}-body`} className="px-3 pb-5 pt-3">
+          <EpisodeDetail key={ep.ep} index={ep.ep} isOpen={isOpen} toggle={toggle} />
+        </div>
+      ) : null}
+    </article>
+  );
+}
+
+function EpisodeDetail({ index, isOpen, toggle }: { index: number } & DisclosureProps) {
+  const { data, error, retry } = useDataset<{ episode: Episode }>(`episode?index=${index}`);
+  if (!data || data.episode.ep !== index) return <LoadState error={error} retry={retry} />;
+  const ep = data.episode;
+  const expanded = true;
   const toolsKey = `${ep.ep}.tools`;
   const artifactsKey = `${ep.ep}.artifacts`;
-  const toolsOpen = isOpen(toolsKey, expanded);
+  const toolsOpen = isOpen(toolsKey, false);
   const artifactsOpen = isOpen(artifactsKey, false);
   const artifacts = Object.entries(ep.artifacts).filter(([, items]) => items.length);
   return (
-    <article
-      ref={articleRef}
-      aria-label={`Episode ${ep.ep}`}
-      className={`min-w-0 scroll-mt-3 border-b border-muted/20 py-4 ${selected ? "rounded-md bg-primary/5 px-3" : ""}`}
-    >
-      <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-xs">
-        <button
-          type="button"
-          aria-expanded={selected}
-          aria-label={`${selected ? "Close" : "Open"} episode ${ep.ep}`}
-          className="min-h-11 font-medium text-primary md:min-h-8"
-          onClick={onSelect}
-        >
-          Episode {ep.ep} <span aria-hidden="true">{selected ? "−" : "+"}</span>
-        </button>
-        <p className="text-muted">
-          <SourceLink index={ep.idx_first} />
-          {ep.idx_first !== ep.idx_last ? (
-            <>
-              {" "}
-              – <SourceLink index={ep.idx_last} />
-            </>
-          ) : null}{" "}
-          · {ep.ts_start?.slice(11)}
-        </p>
-      </div>
-      {ep.groups.length ? (
-        <div className="mb-3 flex flex-wrap gap-1.5">
-          {ep.groups.map((g) => (
-            <TagChip key={g} name={g} />
-          ))}
-        </div>
-      ) : null}
-      {ep.note ? <p className="text-sm leading-6 text-muted">{ep.note}</p> : null}
+    <>
+      <p className="mb-4 text-xs text-muted">
+        Messages <SourceLink index={ep.idx_first} />
+        {ep.idx_first !== ep.idx_last ? (
+          <>
+            {" "}
+            – <SourceLink index={ep.idx_last} />
+          </>
+        ) : null}
+      </p>
+      {ep.note ? <p className="mb-3 text-sm leading-6 text-muted">{ep.note}</p> : null}
       {ep.thinking ? (
         <Expandable
           id={`${ep.ep}.thinking`}
@@ -386,7 +360,7 @@ function EpisodeCard({
             aria-expanded={toolsOpen}
             aria-controls={`ep-${toolsKey}`}
             className="min-h-11 text-xs text-muted md:min-h-8"
-            onClick={() => toggle(toolsKey, expanded)}
+            onClick={() => toggle(toolsKey, false)}
           >
             {toolsOpen ? "−" : "+"} {ep.tools.length} tool calls
           </button>
@@ -415,7 +389,7 @@ function EpisodeCard({
           ) : null}
         </div>
       ) : null}
-    </article>
+    </>
   );
 }
 function Expandable({
