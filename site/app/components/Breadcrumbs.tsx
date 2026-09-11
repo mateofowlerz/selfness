@@ -11,6 +11,13 @@ const LABEL_MAP: Record<string, string> = {
   cv: "CV",
 };
 
+const INVESTIGATION_LABELS: Record<string, string> = {
+  search: "Regex & tags",
+  semantic: "Semantic search",
+  episodes: "Episodes",
+  transcript: "Transcript",
+};
+
 function toLabel(segment: string): string {
   if (LABEL_MAP[segment]) return LABEL_MAP[segment];
   return segment.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
@@ -22,27 +29,35 @@ export default function Breadcrumbs() {
   if (pathname === "/") return null;
 
   const segments = pathname.split("/").filter(Boolean);
+  const isInvestigation = segments[0] === "investigation";
 
   return (
     <nav aria-label="Breadcrumb" className="pt-4 text-sm text-(--muted)">
-      <ol className="flex items-center gap-1">
+      <ol className="flex flex-wrap items-center gap-1">
         <li>
           <Link href="/" className="hover:text-(--fg) transition-colors">
             Home
           </Link>
         </li>
         {segments.map((segment, i) => {
-          const href = `/${segments.slice(0, i + 1).join("/")}`;
+          const href =
+            isInvestigation && i === 0
+              ? "/anthropic-cybersecurity-investigation"
+              : `/${segments.slice(0, i + 1).join("/")}`;
           const isLast = i === segments.length - 1;
+          const label =
+            isInvestigation && i === 1 ? (INVESTIGATION_LABELS[segment] ?? toLabel(segment)) : toLabel(segment);
 
           return (
             <li key={href} className="flex items-center gap-1">
-              <span>/</span>
+              <span aria-hidden="true">/</span>
               {isLast ? (
-                <span className="text-(--fg)">{toLabel(segment)}</span>
+                <span aria-current="page" className="text-(--fg)">
+                  {label}
+                </span>
               ) : (
                 <Link href={href} className="hover:text-(--fg) transition-colors">
-                  {toLabel(segment)}
+                  {label}
                 </Link>
               )}
             </li>
