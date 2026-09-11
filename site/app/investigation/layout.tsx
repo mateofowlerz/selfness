@@ -10,14 +10,14 @@ export const metadata: Metadata = {
 };
 export default function InvestigationLayout({ children }: { children: React.ReactNode }) {
   return (
-    <main className="min-w-0 [&_button]:cursor-pointer [&_button:disabled]:cursor-wait [&_button:disabled]:opacity-50 [&_:focus-visible]:outline-2 [&_:focus-visible]:outline-offset-4 [&_:focus-visible]:outline-primary">
+    <main className="min-w-0 has-[[data-search-workspace]]:py-5! has-[[data-search-workspace]]:[&_nav]:mb-5 [&_button]:cursor-pointer [&_button:disabled]:cursor-wait [&_button:disabled]:opacity-50 [&_:focus-visible]:outline-2 [&_:focus-visible]:outline-offset-4 [&_:focus-visible]:outline-primary">
       <Link
         href="/anthropic-cybersecurity-investigation"
         className="inline-flex min-h-11 items-center text-sm text-muted hover:text-primary"
       >
         ← Back to the investigation
       </Link>
-      <p className="mt-6 mb-2 text-xs uppercase tracking-[0.16em] text-muted">Research companion · Mythos 5</p>
+      <p className="mt-3 mb-1 text-xs uppercase tracking-[0.16em] text-muted">Research companion · Mythos 5</p>
       <Navigation />
       {children}
       <footer className="mt-16 border-t border-muted/20 pt-6 text-xs text-muted">

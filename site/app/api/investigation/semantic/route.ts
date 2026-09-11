@@ -44,7 +44,7 @@ export async function POST(request: Request) {
   if (!Number.isInteger(k) || k < 1 || k > 50) return reply("Choose between 1 and 50 results.", 400);
   const key = process.env.OPENAI_API_KEY;
   if (!fromMessage && !key)
-    return reply("Text-query search is unavailable. Try finding passages similar to an existing message below.", 503);
+    return reply("Semantic search is temporarily unavailable. You can still explore the transcript with tags.", 503);
   const cached = cache.get(cacheKey);
   if (cached) return Response.json({ results: cached.slice(0, k), model: "text-embedding-3-large" });
   if (Date.now() - windowStart > 60_000) {
@@ -71,14 +71,14 @@ export async function POST(request: Request) {
         method: "POST",
         headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
         body: JSON.stringify({ model: meta.model, input: query, encoding_format: "float" }),
-        signal: AbortSignal.timeout(20_000),
+        signal: AbortSignal.any([request.signal, AbortSignal.timeout(20_000)]),
         cache: "no-store",
       });
       if (!response.ok) {
         const failure = await response.json().catch(() => ({}));
         if (failure.error?.type === "insufficient_quota" || failure.error?.code === "credit_balance_exhausted")
           return reply(
-            "Text-query search is temporarily unavailable because the embedding service has no remaining credit. You can still find similar passages from the cached messages below.",
+            "Semantic search is temporarily unavailable. You can still explore the transcript with tags.",
             503,
           );
         return reply("The embedding service is unavailable. Please try again shortly.", 502);

@@ -1,278 +1,252 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { rankSignals } from "@/app/lib/investigation/search";
 import type { Scope, SearchData } from "@/app/lib/investigation/types";
 import { buttonClass, inputClass, LoadState, MessageDetail, useDataset } from "../shared";
+import { TagChip, tagChipClass, tagLabel } from "../tag-chip";
+import { useSearchUrl } from "../use-search-url";
 
 export default function Search() {
   const load = useDataset<SearchData>("search");
-  if (!load.data)
-    return (
-      <>
-        <h1>Follow the reasoning.</h1>
-        <LoadState {...load} />
-      </>
-    );
-  return <SearchArchive data={load.data} />;
+  return (
+    <div data-search-workspace>
+      <h1 className="mb-1! text-2xl!">Follow the reasoning.</h1>
+      <p className="mb-6 text-sm text-muted">Explore the transcript by tag, phrase, or message number.</p>
+      {load.data ? <SearchArchive data={load.data} /> : <LoadState {...load} />}
+    </div>
+  );
 }
 function SearchArchive({ data }: { data: SearchData }) {
   const names = useMemo(() => Object.keys(data.definitions.groups), [data]);
-  const [selected, setSelected] = useState(names);
-  const [scope, setScope] = useState<Scope>("both");
-  const [minimum, setMinimum] = useState(4);
-  const [wobble, setWobble] = useState(false);
-  const [matchAll, setMatchAll] = useState(false);
-  const [query, setQuery] = useState("");
-  const [limit, setLimit] = useState(20);
-  const [current, setCurrent] = useState<number | null>(null);
-  const detailRef = useRef<HTMLElement>(null);
-  useEffect(() => {
-    if (current !== null) detailRef.current?.scrollIntoView({ block: "start" });
-  }, [current]);
-  useEffect(() => {
-    const update = () => {
-      const match = window.location.hash.match(/^#m(\d+)$/);
-      setCurrent(match ? Number(match[1]) : null);
-    };
-    const params = new URLSearchParams(window.location.search);
-    if (params.has("groups")) setSelected((params.get("groups") ?? "").split(",").filter((g) => names.includes(g)));
-    if (params.get("match") === "all") setMatchAll(true);
-    update();
-    window.addEventListener("hashchange", update);
-    return () => window.removeEventListener("hashchange", update);
-  }, [names]);
+  const { params, hash, update } = useSearchUrl();
+  const selected = params.has("groups")
+    ? names.filter((name) => (params.get("groups") ?? "").split(",").includes(name))
+    : names;
+  const scope: Scope =
+    params.get("scope") === "thinking" ? "thinking" : params.get("scope") === "visible" ? "visible" : "both";
+  const query = params.get("q") ?? "";
+  const requestedLimit = Number(params.get("limit"));
+  const limit =
+    Number.isSafeInteger(requestedLimit) && requestedLimit >= 20
+      ? Math.min(requestedLimit, data.scopes[scope].length)
+      : 20;
+  const current = /^m\d+$/.test(hash) ? Number(hash.slice(1)) : null;
+  const showDefinitions = params.get("definitions") === "1";
+  const currentRef = useRef<HTMLElement>(null);
+  const resultList = useRef<HTMLDivElement>(null);
+  // Depend on the serialized selection so unrelated URL changes do not rerank.
+  const selectionKey = selected.join(",");
   const ranked = useMemo(
     () =>
-      rankSignals(data, scope, selected, minimum, wobble, matchAll).filter(
-        (r) =>
-          !query.trim() ||
-          `${r.index} ${r.excerpt} ${r.summary} ${r.groups.join(" ")}`
-            .toLowerCase()
-            .includes(query.trim().toLowerCase()),
-      ),
-    [data, scope, selected, minimum, wobble, matchAll, query],
+      rankSignals(data, scope, selectionKey.split(",").filter(Boolean), 0, false).filter((r) => {
+        const needle = query.trim().replace(/^#/, "").toLowerCase();
+        return !needle || `${r.index} ${r.excerpt} ${r.summary} ${r.groups.join(" ")}`.toLowerCase().includes(needle);
+      }),
+    [data, scope, selectionKey, query],
   );
-  function open(index: number) {
-    window.location.hash = `m${index}`;
-    setCurrent(index);
+  const currentIsVisible = ranked.slice(0, limit).some((r) => r.index === current);
+  useEffect(() => {
+    if (current !== null) currentRef.current?.scrollIntoView({ block: "nearest" });
+  }, [current]);
+  function filter(values: Record<string, string | null>, replace = false) {
+    update({ ...values, limit: null, match: null }, { replace, hash: "" });
+    resultList.current?.scrollTo({ top: 0 });
   }
   function reset() {
-    setSelected(names);
-    setScope("both");
-    setMinimum(4);
-    setWobble(false);
-    setMatchAll(false);
-    setQuery("");
-    setLimit(20);
+    filter({ groups: null, scope: null, q: null, definitions: null });
+  }
+  function detail(index: number) {
+    return (
+      <section
+        ref={currentRef}
+        aria-label={`Message #${index} source`}
+        className="mt-3 rounded-md border border-muted/20 bg-white/50 p-4"
+      >
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-sm font-medium">Original message #{index}</span>
+          <button
+            type="button"
+            className="min-h-11 px-2 text-xs text-muted underline md:min-h-8"
+            onClick={() => update({}, { hash: "" })}
+          >
+            Close message
+          </button>
+        </div>
+        <MessageDetail key={index} index={index} scope={scope} groups={selected} />
+      </section>
+    );
   }
   return (
-    <>
-      <h1 className="mb-3">Follow the reasoning.</h1>
-      <p className="mb-8 text-muted">
-        Find moments where the model questions its environment, flags harm, or justifies continuing. These tags come
-        from the investigation’s original regex patterns.
-      </p>
-      <div className="space-y-5">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <label className="text-sm">
-            Search within excerpts & summaries
-            <input
-              type="search"
-              className={`${inputClass} mt-2`}
-              placeholder="e.g. internet, PyPI, #139"
-              value={query}
-              onChange={(e) => {
-                setQuery(e.target.value.replace(/^#/, ""));
-                setLimit(20);
-              }}
-            />
-          </label>
-          <label className="text-sm">
-            Reasoning scope
-            <select
-              className={`${inputClass} mt-2`}
-              value={scope}
-              onChange={(e) => {
-                setScope(e.target.value as Scope);
-                setLimit(20);
-              }}
-            >
-              <option value="both">Thinking + visible text</option>
-              <option value="thinking">Thinking only</option>
-              <option value="visible">Visible text only</option>
-            </select>
-          </label>
-        </div>
-        <fieldset>
-          <legend className="mb-2 text-sm">Signal groups</legend>
+    <div className="grid items-start gap-6 lg:grid-cols-[260px_minmax(0,1fr)] lg:gap-8">
+      <aside aria-label="Search filters" className="lg:sticky lg:top-5">
+        <label className="block text-xs font-medium">
+          Search messages
+          <input
+            type="search"
+            className={`${inputClass} mt-2`}
+            placeholder="Phrase or #139"
+            value={query}
+            onChange={(e) => filter({ q: e.target.value || null }, true)}
+          />
+        </label>
+        <label className="mt-4 block text-xs font-medium">
+          Reasoning scope
+          <select
+            className={`${inputClass} mt-2`}
+            value={scope}
+            onChange={(e) => filter({ scope: e.target.value === "both" ? null : e.target.value })}
+          >
+            <option value="both">Thinking + visible text</option>
+            <option value="thinking">Thinking only</option>
+            <option value="visible">Visible text only</option>
+          </select>
+        </label>
+        <fieldset className="mt-5">
+          <legend className="text-xs font-medium">
+            Tags{" "}
+            <span className="ml-1 text-muted">
+              {selected.length}/{names.length}
+            </span>
+          </legend>
+          <p className="mt-1 mb-3 text-xs text-muted">Matches any selected tag.</p>
           <div className="flex flex-wrap gap-2">
-            {names.map((name) => (
-              <button
-                key={name}
-                type="button"
-                aria-pressed={selected.includes(name)}
-                title={data.definitions.groups[name].description}
-                className={`min-h-11 rounded border px-3 py-2 text-left text-xs leading-5 ${selected.includes(name) ? "border-primary/30 bg-primary/5 text-primary" : "border-muted/20 text-muted hover:border-muted/50"}`}
-                onClick={() => {
-                  setSelected((s) => (s.includes(name) ? s.filter((g) => g !== name) : [...s, name]));
-                  setLimit(20);
-                }}
-              >
-                {name.replaceAll("_", " ")}
-              </button>
-            ))}
+            {names.map((name) => {
+              const active = selected.includes(name);
+              return (
+                <button
+                  key={name}
+                  type="button"
+                  aria-pressed={active}
+                  title={data.definitions.groups[name].description}
+                  className={`${tagChipClass} min-h-11 md:min-h-8 ${active ? "border-primary bg-primary text-white" : "border-muted/30 bg-transparent text-muted hover:border-muted"}`}
+                  onClick={() => {
+                    const next = active ? selected.filter((g) => g !== name) : [...selected, name];
+                    filter({ groups: next.length === names.length ? null : next.join(",") });
+                  }}
+                >
+                  <span aria-hidden="true" className="w-3 shrink-0 text-center">
+                    {active ? "✓" : "+"}
+                  </span>
+                  {tagLabel(name)}
+                </button>
+              );
+            })}
           </div>
-          <div className="mt-2 flex flex-wrap gap-x-4 text-xs">
-            <button type="button" className="min-h-11 text-muted underline" onClick={() => setSelected(names)}>
+          <div className="mt-2 flex gap-4 text-xs">
+            <button
+              type="button"
+              className="min-h-11 text-muted underline md:min-h-8"
+              onClick={() => filter({ groups: null })}
+            >
               Select all
-            </button>
-            <button type="button" className="min-h-11 text-muted underline" onClick={() => setSelected([])}>
-              Clear tags
             </button>
             <button
               type="button"
-              className="min-h-11 text-primary underline"
-              onClick={() => {
-                setSelected(["self_justification_via_intent", "sim_vs_real_deliberation"]);
-                setMatchAll(true);
-                setWobble(false);
-                setMinimum(4);
-              }}
+              className="min-h-11 text-muted underline md:min-h-8"
+              onClick={() => filter({ groups: "" })}
             >
-              Try my self-justification filter
+              Clear tags
             </button>
           </div>
         </fieldset>
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-3 border-y border-muted/20 py-3">
-          <label className="flex min-h-11 items-center gap-3 text-sm">
-            Minimum score{" "}
-            <input
-              aria-label="Minimum score"
-              type="range"
-              min="0"
-              max="24"
-              className="w-24 accent-primary"
-              value={minimum}
-              onChange={(e) => setMinimum(Number(e.target.value))}
-            />
-            <span className="w-5 tabular-nums">{minimum}</span>
-          </label>
-          <label className="flex min-h-11 items-center gap-2 text-sm">
-            <input
-              className="size-4 accent-primary"
-              type="checkbox"
-              checked={matchAll}
-              onChange={(e) => setMatchAll(e.target.checked)}
-            />
-            Match every selected tag
-          </label>
-          <label className="flex min-h-11 items-center gap-2 text-sm">
-            <input
-              className="size-4 accent-primary"
-              type="checkbox"
-              checked={wobble}
-              onChange={(e) => setWobble(e.target.checked)}
-            />
-            Include self-deception similarity
-          </label>
-        </div>
-        {wobble ? (
-          <p className="text-xs text-muted">
-            Adds cached vector matches at ≥ 0.25, including messages outside the selected regex tags and scope. With
-            “match every tag,” only tagged candidates qualify. Similarity is a retrieval aid, not a probability.
-          </p>
-        ) : null}
-        <details className="text-xs text-muted">
-          <summary className="min-h-11 cursor-pointer py-3">How the scores and tags work</summary>
-          <p className="mb-3">
-            Only Assistant / TextMessage records are tagged. A score sums the weights of distinct matched groups plus
-            the original co-occurrence bonuses. Thinking-only scope changes the searched text; message context remains
-            complete.
-          </p>
-          {names.map((g) => (
-            <div key={g} className="mb-4">
-              <p className="font-medium text-fg">
-                {g} · weight {data.definitions.groups[g].weight}
+        <div className="mt-4 border-t border-muted/20 pt-3">
+          <button
+            type="button"
+            aria-expanded={showDefinitions}
+            aria-controls="tag-definitions"
+            className="min-h-11 text-xs text-muted md:min-h-8"
+            onClick={() => update({ definitions: showDefinitions ? null : "1" })}
+          >
+            {showDefinitions ? "−" : "+"} About these tags
+          </button>
+          {showDefinitions ? (
+            <div id="tag-definitions" className="mt-2 space-y-4 text-xs text-muted">
+              <p>
+                Tags use the investigation’s original regex patterns. Summaries are generated reading aids; open a
+                message for the source.
               </p>
-              <p>{data.definitions.groups[g].description}</p>
-              <pre className="mt-2 overflow-x-auto whitespace-pre-wrap break-words">
-                {data.definitions.groups[g].patterns.join("\n")}
-              </pre>
+              {names.map((name) => (
+                <div key={name}>
+                  <p className="font-medium text-fg">{tagLabel(name)}</p>
+                  <p className="mt-1">{data.definitions.groups[name].description}</p>
+                  <pre className="mt-2 whitespace-pre-wrap break-words text-[11px]">
+                    {data.definitions.groups[name].patterns.join("\n")}
+                  </pre>
+                </div>
+              ))}
             </div>
-          ))}
-        </details>
-      </div>
-      {current !== null ? (
-        <section
-          ref={detailRef}
-          aria-label="Selected message"
-          className="my-8 rounded border border-primary/25 p-4 sm:p-5"
+          ) : null}
+        </div>
+      </aside>
+      <section aria-label="Matching messages" className="min-w-0">
+        <div className="flex min-h-11 items-center justify-between gap-3 border-b border-muted/20 pb-2">
+          <output className="text-sm tabular-nums" aria-live="polite">
+            {ranked.length} <span className="text-muted">matching messages</span>
+          </output>
+          <button type="button" className="min-h-11 text-xs text-muted underline md:min-h-8" onClick={reset}>
+            Reset filters
+          </button>
+        </div>
+        <div
+          ref={resultList}
+          className="lg:max-h-[calc(100dvh-420px)] lg:min-h-96 lg:overflow-y-auto lg:overscroll-contain lg:pr-3 [scrollbar-gutter:stable]"
         >
-          <div className="flex items-center justify-between">
-            <h2 className="mb-0 text-lg">Message #{current}</h2>
-            <button
-              type="button"
-              className={buttonClass}
-              onClick={() => {
-                setCurrent(null);
-                window.history.replaceState(null, "", window.location.pathname + window.location.search);
-              }}
-            >
-              Close
-            </button>
-          </div>
-          <div className="mt-4">
-            <MessageDetail index={current} scope={scope} groups={selected} />
-          </div>
-        </section>
-      ) : null}
-      <div className="mt-5 mb-2 flex items-center justify-between">
-        <output className="text-sm text-muted">{ranked.length} matching messages</output>
-        <button type="button" className="min-h-11 text-xs text-muted underline" onClick={reset}>
-          Reset filters
-        </button>
-      </div>
-      {ranked.length === 0 ? (
-        <p className="my-10 text-muted">No messages match. Try selecting more tags or lowering the minimum score.</p>
-      ) : null}
-      <div>
-        {ranked.slice(0, limit).map((r) => (
-          <article key={r.index} className="border-t border-muted/20 py-5">
-            <button
-              type="button"
-              className="group block w-full text-left"
-              onClick={() => {
-                open(r.index);
-              }}
-            >
-              <div className="flex items-baseline justify-between gap-3">
-                <span className="font-medium text-primary">
-                  Message #{r.index} <span aria-hidden="true">↗</span>
-                </span>
-                <span className="text-xs tabular-nums text-muted">
-                  score {r.score}
-                  {wobble && r.wobble !== null ? ` · similarity ${r.wobble.toFixed(2)}` : ""}
-                </span>
-              </div>
-              {r.summary ? (
-                <>
-                  <p className="mt-2 text-sm leading-6">{r.summary.split("\n")[0]}</p>
-                  <span className="text-[11px] text-muted">Kimi summary · verify against source</span>
-                </>
-              ) : null}
-              <p className="mt-2 line-clamp-3 text-sm text-muted">{r.excerpt}</p>
-              <p className="mt-3 text-[11px] text-primary/90">
-                {r.groups.map((g) => g.replaceAll("_", " ")).join(" · ")}
+          {current !== null && !currentIsVisible ? detail(current) : null}
+          {!ranked.length ? (
+            <div className="py-10">
+              <p className="text-sm">
+                {!selected.length ? "Choose a tag to explore the messages." : "No messages match these filters."}
               </p>
+              <p className="mt-1 text-xs text-muted">
+                {!selected.length
+                  ? "Select all to browse every tagged message."
+                  : "Try another phrase, more tags, or a broader reasoning scope."}
+              </p>
+            </div>
+          ) : null}
+          {ranked.slice(0, limit).map((r) => (
+            <article key={r.index} className="border-b border-muted/20 py-4">
+              <button
+                type="button"
+                aria-label={`${current === r.index ? "Close" : "Open"} message #${r.index}`}
+                aria-expanded={current === r.index}
+                className="group block w-full rounded-sm text-left"
+                onClick={() => update({}, { hash: current === r.index ? "" : `m${r.index}` })}
+              >
+                <span className="flex items-center justify-between gap-3 text-xs">
+                  <span className="font-medium text-primary">Message #{r.index}</span>
+                  <span className="text-muted group-hover:text-primary">
+                    {current === r.index ? "Close message −" : "Read message +"}
+                  </span>
+                </span>
+                {r.summary ? (
+                  <p className="mt-2 text-[15px] font-medium leading-6">{r.summary.split("\n")[0]}</p>
+                ) : null}
+                <p
+                  className={`mt-2 line-clamp-2 break-words ${r.summary ? "text-xs leading-5 text-muted" : "text-sm leading-6 text-fg"}`}
+                >
+                  {r.excerpt}
+                </p>
+                <span className="mt-3 flex flex-wrap gap-1.5">
+                  {r.groups.map((name) => (
+                    <TagChip key={name} name={name} />
+                  ))}
+                </span>
+              </button>
+              {current === r.index ? detail(r.index) : null}
+            </article>
+          ))}
+          {limit < ranked.length ? (
+            <button
+              type="button"
+              className={`${buttonClass} my-4 w-full`}
+              onClick={() => update({ limit: String(limit + 20) })}
+            >
+              Show 20 more messages
             </button>
-          </article>
-        ))}
-      </div>
-      {limit < ranked.length ? (
-        <button type="button" className={`${buttonClass} mt-5 w-full`} onClick={() => setLimit((v) => v + 20)}>
-          Show 20 more messages
-        </button>
-      ) : null}
-    </>
+          ) : null}
+        </div>
+      </section>
+    </div>
   );
 }

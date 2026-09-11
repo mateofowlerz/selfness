@@ -1,173 +1,152 @@
 "use client";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { SemanticHit } from "@/app/lib/investigation/types";
-import { buttonClass, inputClass, linkClass, SourceLink } from "../shared";
+import { inputClass, linkClass } from "../shared";
+import { useSearchUrl } from "../use-search-url";
 
-const examples = ["Is this the real internet?", "Justifying a harmful action", "Finding an email and phone number"];
+type SearchResult = { query: string; hits: SemanticHit[]; error: string };
 export default function Semantic() {
-  const [query, setQuery] = useState("");
-  const [k, setK] = useState(10);
-  const [results, setResults] = useState<SemanticHit[]>([]);
-  const [searched, setSearched] = useState("");
-  const [error, setError] = useState("");
+  const { params, update } = useSearchUrl();
+  const query = (params.get("q") ?? "").slice(0, 1000);
+  const normalizedQuery = query.trim();
+  const [result, setResult] = useState<SearchResult>({ query: "", hits: [], error: "" });
+  const [attempt, setAttempt] = useState(0);
   const [busy, setBusy] = useState(false);
-  const input = useRef<HTMLInputElement>(null);
-  async function search(message?: number) {
-    if ((!message && !query.trim()) || busy) return;
-    setBusy(true);
-    setError("");
-    setResults([]);
-    setSearched("");
-    try {
-      const response = await fetch("/api/investigation/semantic", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(message ? { message, k } : { query, k }),
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Search could not finish.");
-      setResults(data.results);
-      setSearched(message ? `passages like message #${message}` : query.trim());
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Search could not finish. Please try again.");
-    } finally {
+  const cache = useRef(new Map<string, SemanticHit[]>());
+  const passages = useRef<HTMLElement>(null);
+  const pending = !!normalizedQuery && (busy || normalizedQuery !== result.query);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: The retry counter intentionally restarts a failed request.
+  useEffect(() => {
+    if (!normalizedQuery) {
+      setResult({ query: "", hits: [], error: "" });
       setBusy(false);
+      return;
     }
-  }
+    const cached = cache.current.get(normalizedQuery);
+    if (cached) {
+      setResult({ query: normalizedQuery, hits: cached, error: "" });
+      setBusy(false);
+      passages.current?.scrollTo({ top: 0 });
+      return;
+    }
+    const controller = new AbortController();
+    setBusy(true);
+    // Wait briefly for typing to settle; abort and ignore superseded responses.
+    const timer = window.setTimeout(async () => {
+      try {
+        const response = await fetch("/api/investigation/semantic", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query: normalizedQuery, k: 10 }),
+          signal: controller.signal,
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Search could not finish.");
+        if (controller.signal.aborted) return;
+        const hits: SemanticHit[] = data.results.slice(0, 10);
+        if (cache.current.size >= 50) cache.current.delete(cache.current.keys().next().value as string);
+        cache.current.set(normalizedQuery, hits);
+        setResult({ query: normalizedQuery, hits, error: "" });
+        passages.current?.scrollTo({ top: 0 });
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          setResult({
+            query: normalizedQuery,
+            hits: [],
+            error: error instanceof Error ? error.message : "Search could not finish. Please try again.",
+          });
+        }
+      } finally {
+        if (!controller.signal.aborted) setBusy(false);
+      }
+    }, 450);
+    return () => {
+      window.clearTimeout(timer);
+      controller.abort();
+    };
+  }, [normalizedQuery, attempt]);
+
+  const visibleHits = normalizedQuery ? result.hits : [];
+  const error = !pending && normalizedQuery === result.query ? result.error : "";
   return (
-    <>
-      <h1 className="mb-3">Search for an idea.</h1>
-      <p className="mb-8 text-muted">
-        Describe what you’re looking for in your own words. Explore nearby passages across the model’s reasoning,
-        visible messages, and tool calls.
-      </p>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          void search();
-        }}
-        className="space-y-4"
-      >
-        <label className="block text-sm">
-          What are you looking for?
-          <input
-            ref={input}
-            type="search"
-            required
-            maxLength={1000}
-            className={`${inputClass} mt-2`}
-            placeholder="e.g. knowing something is wrong, then continuing"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-        </label>
-        <div className="flex items-end justify-between gap-4">
-          <label className="text-sm">
-            Results
-            <select value={k} onChange={(e) => setK(Number(e.target.value))} className={`${inputClass} mt-2 min-w-24`}>
-              {[5, 10, 20, 50].map((n) => (
-                <option key={n} value={n}>
-                  {n}
-                </option>
-              ))}
-            </select>
-          </label>
-          <button
-            disabled={busy || !query.trim()}
-            className="min-h-11 rounded bg-primary px-6 py-2 text-sm text-white hover:bg-primary-dark disabled:opacity-50"
-            type="submit"
-          >
-            {busy ? "Searching…" : "Search archive →"}
-          </button>
-        </div>
-      </form>
-      <p className="mt-3 text-xs text-muted">
-        Your query is sent to OpenAI to find similar passages. Source embeddings are already cached; the transcript is
-        not sent again.
-      </p>
-      <div className="my-6 flex flex-wrap gap-2">
-        {examples.map((example) => (
-          <button
-            key={example}
-            type="button"
-            className={`${buttonClass} text-xs`}
-            onClick={() => {
-              setQuery(example);
-              input.current?.focus();
-            }}
-          >
-            {example}
-          </button>
-        ))}
-      </div>
-      <div className="mb-6 border-y border-muted/20 py-4">
-        <p className="mb-2 text-sm">Or start from a source passage.</p>
-        <p className="mb-3 text-xs text-muted">
-          Uses the cached message embeddings directly. No external request is needed.
-        </p>
-        <div className="flex flex-wrap gap-2">
-          {[
-            [139, "Real or simulated?"],
-            [835, "Money and verification"],
-            [2137, "Publishing the package"],
-          ].map(([id, label]) => (
-            <button
-              type="button"
-              key={id}
-              className={`${buttonClass} text-xs`}
-              disabled={busy}
-              onClick={() => void search(Number(id))}
-            >
-              #{id} · {label}
-            </button>
-          ))}
-        </div>
-      </div>
-      <output className="block min-h-12 text-sm text-muted" aria-live="polite">
-        {busy
+    <div data-search-workspace className="mx-auto max-w-[920px]">
+      <h1 className="mb-1! text-2xl!">Search for an idea.</h1>
+      <p className="mb-5 text-sm text-muted">Describe a thought, action, or moment. Passages update as you type.</p>
+      <label className="sr-only" htmlFor="semantic-query">
+        Search for an idea
+      </label>
+      <input
+        id="semantic-query"
+        type="search"
+        maxLength={1000}
+        className={`${inputClass} bg-white/50`}
+        placeholder="e.g. knowing something is wrong, then continuing"
+        value={query}
+        onChange={(e) => update({ q: e.target.value || null }, { replace: true })}
+        aria-describedby="semantic-status"
+      />
+      <output id="semantic-status" className="flex min-h-12 items-center text-xs text-muted" aria-live="polite">
+        {pending
           ? "Finding related passages…"
-          : searched
-            ? `${results.length} passages for “${searched}”`
-            : "3,839 passages · text-embedding-3-large · cosine similarity"}
+          : error
+            ? "Search unavailable"
+            : normalizedQuery
+              ? `${visibleHits.length} passages for “${result.query}”`
+              : "The 10 closest passages will appear here."}
       </output>
       {error ? (
-        <div role="alert" className="my-4 border-l-2 border-primary pl-4">
+        <div role="alert" className="mb-4 rounded-md border border-muted/20 p-4 text-sm">
           <p>{error}</p>
-          <a className={`${linkClass} text-sm`} href="/investigation/search">
-            Explore with tags
-          </a>
+          <div className="mt-2 flex gap-4 text-xs">
+            <button type="button" className={`${linkClass} min-h-11`} onClick={() => setAttempt((value) => value + 1)}>
+              Try again
+            </button>
+            <a className={`${linkClass} inline-flex min-h-11 items-center`} href="/investigation/search">
+              Explore with tags
+            </a>
+          </div>
         </div>
       ) : null}
-      <div className="space-y-6">
-        {results.map((hit, i) => (
-          <article key={`${hit.index}-${hit.field}-${hit.offset}`} className="border-t border-muted/20 pt-5">
-            <div className="flex justify-between gap-3 text-sm">
-              <p>
-                <span className="mr-2 text-muted">{String(i + 1).padStart(2, "0")}</span>
-                <SourceLink index={hit.index} />
-              </p>
-              <p className="text-xs tabular-nums text-muted">similarity {hit.score.toFixed(4)}</p>
+      <section
+        ref={passages}
+        aria-label="Related passages"
+        aria-busy={pending}
+        // biome-ignore lint/a11y/noNoninteractiveTabindex: Enable keyboard scrolling in this overflow region.
+        tabIndex={0}
+        className={`max-h-[calc(100dvh-465px)] min-h-72 overflow-y-auto overscroll-contain border-y border-muted/20 pr-3 [scrollbar-gutter:stable] ${pending && visibleHits.length ? "opacity-60" : ""}`}
+      >
+        {!visibleHits.length ? (
+          <p className="py-8 text-sm text-muted">
+            {pending
+              ? "Searching the transcript…"
+              : !normalizedQuery
+                ? "Start typing to explore the transcript."
+                : !error
+                  ? "No passages found. Try a different description."
+                  : "Your results will appear here when search is available."}
+          </p>
+        ) : null}
+        {visibleHits.map((hit, i) => (
+          <article
+            key={`${hit.index}-${hit.field}-${hit.offset}`}
+            className="border-b border-muted/20 py-5 last:border-b-0"
+          >
+            <div className="mb-3 flex items-baseline justify-between gap-3 text-xs">
+              <a href={`/investigation/transcript#m${hit.index}`} className="font-medium text-primary hover:underline">
+                <span className="mr-3 tabular-nums text-muted">{String(i + 1).padStart(2, "0")}</span>Message #
+                {hit.index} <span aria-hidden="true">↗</span>
+              </a>
+              <span className="text-muted">
+                {hit.role} · {hit.field.replaceAll("_", " ")}
+              </span>
             </div>
-            <p className="mt-2 mb-4 break-all text-xs text-muted">
-              {hit.role} / {hit.type} · {hit.field}
-              <br />
-              JSONL line {hit.source_line} · field line {hit.field_line} · offset {hit.offset}
-            </p>
-            <blockquote className="whitespace-pre-wrap break-words border-l-2 border-primary/30 pl-4 text-sm leading-7 [overflow-wrap:anywhere]">
+            <blockquote className="whitespace-pre-wrap break-words text-sm leading-6 [overflow-wrap:anywhere]">
               {hit.text}
             </blockquote>
-            <a
-              href={`/investigation/transcript#m${hit.index}`}
-              className={`${linkClass} mt-4 inline-flex min-h-11 items-center text-sm`}
-            >
-              Read full message →
-            </a>
           </article>
         ))}
-      </div>
-      {searched && !results.length ? (
-        <p className="my-6 text-muted">No passages found. Try a different description.</p>
-      ) : null}
-    </>
+      </section>
+    </div>
   );
 }

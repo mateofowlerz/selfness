@@ -28,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <div className="max-w-[640px] mx-auto px-4 sm:px-8">
+        <div className="max-w-[640px] mx-auto px-4 sm:px-8 has-[[data-search-workspace]]:max-w-[1280px]">
           <header className="pt-8 flex items-start justify-between gap-4">
             <div className="min-w-0">
               <Link href="/" className="block no-underline">
