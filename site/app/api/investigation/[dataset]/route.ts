@@ -5,15 +5,22 @@ export const runtime = "nodejs";
 const headers = { "Cache-Control": "public, max-age=3600", "X-Content-Type-Options": "nosniff" };
 export async function GET(request: Request, { params }: { params: Promise<{ dataset: string }> }) {
   const { dataset } = await params;
-  if (dataset === "episode" || dataset === "episode-previews") {
+  if (dataset === "episode" || dataset === "episode-messages" || dataset === "episode-previews") {
     const search = new URL(request.url).searchParams;
-    if (dataset === "episode") {
+    if (dataset === "episode" || dataset === "episode-messages") {
       const raw = search.get("index");
       if (!raw || !/^\d+$/.test(raw))
         return Response.json({ error: "An episode number is required." }, { status: 400 });
       const { episodes } = await readDataset<{ episodes: Episode[] }>("episodes");
       const episode = episodes.find((ep) => ep.ep === Number(raw));
       if (!episode) return Response.json({ error: "This episode is not in the archive." }, { status: 404 });
+      if (dataset === "episode-messages") {
+        const source = await readDataset<Message[]>("messages");
+        const messages = source
+          .filter((m) => m.index >= episode.idx_first && m.index <= episode.idx_last && typeof m.content === "string")
+          .map(({ index, role, content }) => ({ index, role, content }));
+        return Response.json({ episode, messages }, { headers });
+      }
       return Response.json({ episode }, { headers });
     }
     const [{ episodes }, { segments }] = await Promise.all([
