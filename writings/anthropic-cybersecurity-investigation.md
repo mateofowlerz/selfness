@@ -6,24 +6,6 @@ date: 2026-09-10
 
 # Indepentent investigation of Anthropic cybersecurity incidents
 
-## Questions to answer:
-
-- What are the evidences that made the model think it was in a simulated environment?
-
-  > upload malware to (what it said is a "simulated") PyPI package registry.
-
-- What does the model reasons about when it discovers it can act misaligned?
-  - Exiting the sandbox
-  - Other misaligned things
-  - Publishing the PyPI malware package
-    - How does it reacts when someone installs it?
-    - Does it access the affected vendor database?
-- Are the models used for my investigation biased in any way? can I trust their answers?
-  - Is GPT less biased for Claude than vice-versa?
-  - Are they deceiving me?
-- If it doesn’t sees a clear way out, does it searches for it?
-  - Did it see a clear way out of the internet or vehemently searched for it
-
 ## Experiments I’d run if I had access to Mythos
 
 - Would tell it it’s the REAL internet, explicitly, and see if it still breaks in.
