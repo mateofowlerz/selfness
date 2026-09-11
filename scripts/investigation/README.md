@@ -91,9 +91,12 @@ their original CLI paths and should be used with explicit input paths.
 
 The search tools persist state in the URL. Tag search uses `q`, `groups`, `limit`,
 `definitions`, and `#m139` for an open message. Semantic search uses `q`. Episodes
-uses `q`, `stage`, `signal=1`, `full=1`, `limit`, and `#ep2` for selection. Its
-`open` and `closed` parameters preserve individual disclosures, such as
-`open=2.tools,2.artifacts&closed=2.thinking`. Legacy `#stage1` links still work.
+uses `q`, `start`, `limit`, and `#ep2` for the loaded timeline window and current
+episode. `at` preserves the reading position within the episode (0–1000), and
+`timeline=1` opens the compact chapter navigation. `open` and `closed` preserve
+individual disclosures, such as `open=2.tools,2.artifacts&closed=2.thinking`.
+Legacy `stage` and `#stage1` links still work. The reader fetches original messages
+on demand and releases distant episode content while preserving its space.
 
 Browser QA should cover combined tags, empty results, message and
 episode hashes, stage filtering, expanded text/tools/artifacts, a real semantic query, and narrow

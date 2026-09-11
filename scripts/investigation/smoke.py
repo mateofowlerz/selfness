@@ -27,7 +27,7 @@ for path in ["/", "/anthropic-cybersecurity-investigation", "/investigation/sear
     status, body = request(path)
     assert status == 200, (path, status)
     if path == "/":
-        assert b"Anthropic Cybersecurity" in body, "Homepage writing entry"
+        assert b'/anthropic-cybersecurity-investigation' in body, "Homepage investigation link"
 for name in ["search", "segments", "episodes"]:
     assert request("/api/investigation/" + name)[0] == 200, name
 for index in [0, 82, 129, 2144]:
