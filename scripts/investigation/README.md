@@ -98,9 +98,11 @@ localhost and exercises the cached-vector path, not the paid embeddings API.
 
 The writing is imported from Notion's HTML export to preserve rich text.
 The current source is the final pasted revision beginning "Independent
-investigation of rogue Claude instance", rather than the earlier duplicate.
-The wording is unchanged; grammar suggestions are kept outside the published
-article pending the author's approval. Existing transcript links, rose highlights,
+investigation of a rogue Claude instance", with the author's newer opening
+paragraph and reflection ordering from the first draft reconciled into it.
+The approved grammar corrections were applied to both Notion drafts and the
+article; optional changes to meaning and narrative style remain unapplied.
+Source quotations retain their original wording. Existing transcript links, rose highlights,
 and quoted-list structure are preserved after Notion's browser-copy round trip.
 Local site URLs remain relative. METR and Kimi-trace placeholders await targets.
 
