@@ -24,7 +24,7 @@ The problem is, he was explicitly told not to access the real internet, so he st
 
 The agent did a lot of vehemently misaligned actions, but what stands out is how it goes around obvious hard-no’s by convincing itself that everything he encounters on the real internet is actually a simulation. As if its HHH training were in conflict with the path-to-reward it learned during RL.
 
-If [you read the CoT](https://mateofowler.com/investigation/semantic), you are basically reading a self-deceiving, delusional model that’s clearly intelligent but lacks common sense. It reasons things that favor his misaligned objective instead of seeking the truth.
+If [you read the CoT](/investigation/episodes), you are basically reading a self-deceiving, delusional model that’s clearly intelligent but lacks common sense. It reasons things that favor his misaligned objective instead of seeking the truth.
 
 What the model tried to accomplish is to publish a malicious package called `mlflow-ui` on PyPI. This was because the employees from the fake company that owned the flag were instructed to `pip install mlflow-ui`. `mlflow-ui` doesn’t exist, as `mlflow` already ships ‘ui’. He finally accomplished this task, after doing a full catwalk around internet services.
 
@@ -76,7 +76,7 @@ This is why I chose to use a locally hosted Kimi instance (so I can have the thi
 
 Kimi and I used [the search methods](/investigation) a lot to find messages that were relevant and I added [a lot of tags to messages](/investigation/search) to more effectively search. I found great combinations such as **self_justification_via_intent + sim_vs_real_deliberation,** which got me all messages that pointed to the traces of self-deception used to justify bad behavior.
 
-You can interact with this (primitive) UI at: [regex search](/investigation/search), [embeddings search](/investigation/semantic), and [episodes](/investigation/episodes)
+You can explore the [regex search](/investigation/search), use [embeddings search](/investigation/semantic), or [read the transcript](/investigation/episodes).
 
 Forcing Kimi to use [the search methods developed](/investigation) and citing the messages where it gets the things from was extremely useful. [Reconstructing the story](/investigation/episodes) and getting the **key** messages was 100% a collaboration between [the available tools](/investigation) and my *“taste”* on what things to look for.
 

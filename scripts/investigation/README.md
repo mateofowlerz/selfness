@@ -94,7 +94,8 @@ The search tools persist state in the URL. Tag search uses `q`, `groups`, `limit
 uses `q`, `start`, `limit`, and `#ep2` for the loaded timeline window and current
 episode. `at` preserves the reading position within the episode (0–1000), and
 `timeline=1` opens the compact chapter navigation. `open` and `closed` preserve
-individual disclosures, such as `open=2.tools,2.artifacts&closed=2.thinking`.
+individual disclosures, such as `open=532.message.1633,532.tools`. Messages
+start collapsed; opening a message reveals its original thinking and visible text.
 Legacy `stage` and `#stage1` links still work. The reader fetches original messages
 on demand and releases distant episode content while preserving its space.
 
