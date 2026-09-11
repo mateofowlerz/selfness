@@ -55,6 +55,9 @@ export type Episode = {
   artifacts: Record<string, string[]>;
   tools: { idx: number; name: string; call_preview: string; result_preview: string }[];
 };
+export type EpisodePreview = Pick<Episode, "ep" | "idx_first" | "idx_last" | "ts_start" | "groups"> & {
+  preview: string;
+};
 export type Segment = {
   id: number;
   ep_start: number;
