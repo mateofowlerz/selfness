@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins: ["127.0.0.1"],
   outputFileTracingIncludes: {
     "/api/investigation/*": ["./data/investigation/*.json"],
     "/api/investigation/semantic": ["./data/investigation/semantic.json", "./data/investigation/vectors.f32"],

@@ -265,7 +265,9 @@ export default async function Writing({ params }: { params: Promise<{ slug: stri
       >
         {body}
       </Markdown>
-      {process.env.NODE_ENV === "production" ? null : <InlineEditor slug={slug} source={body} />}
+      {process.env.NODE_ENV === "production" ? null : (
+        <InlineEditor key={slug} slug={slug} source={stripFrontmatter(writing.content)} />
+      )}
       {notes.size > 0 ? (
         <ol className="mt-12 list-decimal border-t border-muted/10 pt-6 pl-5 text-sm text-(--muted) xl:hidden">
           {[...notes].map(([id, text]) => (

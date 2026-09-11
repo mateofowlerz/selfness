@@ -13,15 +13,28 @@ type Patch = {
   end: number;
   expected: string;
   replacement: string;
+  wholeDocument?: boolean;
 };
 
-export async function patchWriting({ slug, start, end, expected, replacement }: Patch) {
+export async function patchWriting({ slug, start, end, expected, replacement, wholeDocument }: Patch) {
   if (process.env.NODE_ENV === "production") {
     return { error: "Editing is only available locally" };
   }
 
-  if (!/^[a-z0-9-]+$/.test(slug)) {
+  if (typeof slug !== "string" || !/^[a-z0-9-]+$/.test(slug)) {
     return { error: "Invalid slug" };
+  }
+
+  if (
+    !Number.isInteger(start) ||
+    !Number.isInteger(end) ||
+    start < 0 ||
+    end < start ||
+    typeof expected !== "string" ||
+    typeof replacement !== "string" ||
+    replacement.length > 2_000_000
+  ) {
+    return { error: "Invalid edit" };
   }
 
   const filePath = path.join(WRITINGS_DIR, `${slug}.md`);
@@ -35,8 +48,15 @@ export async function patchWriting({ slug, start, end, expected, replacement }: 
   const body = content.slice(frontmatter.length);
 
   // offsets come from the rendered source, so make sure they still point at the same text
-  if (body.slice(start, end) !== expected) {
-    return { error: "File changed on disk — reload" };
+  if (
+    end > body.length ||
+    (wholeDocument && (start !== 0 || end !== body.length)) ||
+    body.slice(start, end) !== expected
+  ) {
+    return {
+      error: "The writing changed on disk. Compare the file version with your draft before saving.",
+      currentBody: body,
+    };
   }
 
   fs.writeFileSync(filePath, frontmatter + body.slice(0, start) + replacement + body.slice(end));
