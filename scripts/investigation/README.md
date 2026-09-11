@@ -96,11 +96,14 @@ For a production HTTP smoke check, start the built server with no API key as sho
 in `smoke.py`, then run `python3 scripts/investigation/smoke.py`. It only contacts
 localhost and exercises the cached-vector path, not the paid embeddings API.
 
-The writing preserves the original Notion wording, structure, quotations, and
-message references, including the latest interpretability paragraph. Only the
-website placeholders are replaced with links to the hosted tools. The METR and
-investigator Kimi-trace placeholders remain pending their actual targets; do not
-remove them or substitute the Mythos transcript for the investigator's traces.
-Browser verification compared all 90 Notion content blocks against the rendered
-article: the wording matches after the two website-placeholder substitutions and
-whitespace/inline-code formatting normalization.
+The writing is imported from Notion's HTML export to preserve rich text, not
+from accessibility/plain-text snapshots (which omit emphasis, highlights,
+dividers, and quote nesting). The website omits the Questions and Experiments
+sections at the author's request. Other wording is unchanged except website
+placeholder substitutions. METR and Kimi-trace placeholders await actual targets.
+
+The import preserves 45 bold spans, five italic spans, six colored highlights,
+five dividers, seven blockquotes (including a bulleted quotation), and the source
+heading levels. Markdown links with destinations `#highlight-teal`,
+`#highlight-blue`, and `#highlight-orange` render as semantic `mark` elements;
+this keeps the source editable without enabling raw HTML in writings.

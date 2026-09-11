@@ -192,6 +192,11 @@ export default async function Writing({ params }: { params: Promise<{ slug: stri
         components={{
           h1: ({ children, node }) => <h1 data-src={sourceRange(node)}>{children}</h1>,
           h2: ({ children, node }) => <h2 data-src={sourceRange(node)}>{children}</h2>,
+          h3: ({ children, node }) => (
+            <h3 className="mb-4 text-xl font-medium tracking-tight" data-src={sourceRange(node)}>
+              {children}
+            </h3>
+          ),
           p: ({ children, node }) => (
             <p className="mb-6" data-src={sourceRange(node)}>
               {processFootnotes(processMusicLinks(children), notes)}
@@ -217,18 +222,36 @@ export default async function Writing({ params }: { params: Promise<{ slug: stri
             }
             return <ImageLink href={`/images/${imageSlug}`} src={src} alt={alt ?? ""} />;
           },
-          a: ({ href, children }) => (
-            <a href={href} className="text-primary underline hover:text-primary-dark">
-              {children}
-            </a>
-          ),
+          a: ({ href, children }) => {
+            // Preserve Notion's inline highlights without enabling raw HTML.
+            const highlightClass =
+              href === "#highlight-teal"
+                ? "bg-emerald-100 text-inherit"
+                : href === "#highlight-blue"
+                  ? "bg-sky-100 text-inherit"
+                  : href === "#highlight-orange"
+                    ? "bg-orange-100 text-inherit"
+                    : null;
+
+            if (highlightClass) return <mark className={highlightClass}>{children}</mark>;
+
+            return (
+              <a href={href} className="text-primary underline hover:text-primary-dark">
+                {children}
+              </a>
+            );
+          },
           blockquote: ({ children }) => (
-            <blockquote className="mb-6 border-l-[3px] border-(--muted)/30 pl-4 [&>p]:mb-0 [&>p+p]:mt-4">
+            <blockquote className="mb-6 border-l-[3px] border-(--muted)/30 pl-4 [&>p]:mb-0 [&>p+p]:mt-4 [&>ul]:mb-0 [&>ol]:mb-0">
               {children}
             </blockquote>
           ),
           hr: () => <hr className="mt-4 mb-10 border-0 border-t border-muted/20" />,
-          ul: ({ children }) => <ul>{children}</ul>,
+          ul: ({ children }) => (
+            <ul className="mb-6 list-disc pl-6 [&_ul]:mt-1 [&_ul]:mb-0 [&_ul]:list-[circle] [&_ul_ul]:list-[square]">
+              {children}
+            </ul>
+          ),
           ol: ({ children }) => <ol className="mb-6 list-decimal pl-6 [&_ol]:mt-1 [&_ol]:mb-0">{children}</ol>,
           li: ({ children, node }) => (
             <li className="mb-1" data-src={sourceRange(node)}>
