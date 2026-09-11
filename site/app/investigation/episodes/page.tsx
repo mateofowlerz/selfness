@@ -1,6 +1,6 @@
-import type { Metadata } from "next";
+import { investigationMetadata } from "../social-metadata";
 import Episodes from "./episodes";
-export const metadata: Metadata = { title: "Episode timeline" };
+export const metadata = investigationMetadata("episodes");
 export default function Page() {
   return <Episodes />;
 }

@@ -1,6 +1,6 @@
-import type { Metadata } from "next";
+import { investigationMetadata } from "../social-metadata";
 import Semantic from "./semantic";
-export const metadata: Metadata = { title: "Semantic search" };
+export const metadata = investigationMetadata("semantic");
 export default function Page() {
   return <Semantic />;
 }

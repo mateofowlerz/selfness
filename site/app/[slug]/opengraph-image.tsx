@@ -21,6 +21,11 @@ export default async function BlogImage({ params }: { params: Promise<{ slug: st
   const isStartupsEssay = slug === "startups-vs-labs";
   const isInvestigation = slug === "anthropic-cybersecurity-investigation";
 
+  if (isInvestigation) {
+    const image = await readFile(join(process.cwd(), "public/og/anthropic-cybersecurity-parcel-v3.png"));
+    return new Response(image, { headers: { "Content-Type": "image/png" } });
+  }
+
   const font = await readFile(join(process.cwd(), "public/fonts/PublicSans-Medium-OG.ttf"));
   const markFile = isStartupsEssay
     ? "startups-vs-labs-star.png"

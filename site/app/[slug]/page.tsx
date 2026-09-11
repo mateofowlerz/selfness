@@ -71,7 +71,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       : slug === "anthropic-cybersecurity-investigation"
         ? [
             {
-              url: "/og/anthropic-cybersecurity-parcel-v2.png",
+              url: "/og/anthropic-cybersecurity-parcel-v3.png",
               width: 1200,
               height: 630,
               alt: "Independent investigation of rogue Claude instance — a skull-marked parcel with a red ribbon",
