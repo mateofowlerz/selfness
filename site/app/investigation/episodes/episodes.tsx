@@ -6,6 +6,7 @@ import { buttonClass, LoadState, linkClass, useDataset } from "../shared";
 import { TagChip } from "../tag-chip";
 import { useSearchUrl } from "../use-search-url";
 import { type DisclosureProps, EpisodeContent } from "./episode-content";
+import { MessageJump } from "./message-jump";
 
 const PAGE = 8;
 const clamp = (n: number, min = 0, max = 1) => Math.max(min, Math.min(max, n));
@@ -69,9 +70,12 @@ export default function Episodes() {
 
 function Timeline({ episodes, segments }: { episodes: EpisodePreview[]; segments: Segment[] }) {
   const { params, hash, update } = useSearchUrl();
+  const message = /^\d+$/.test(params.get("message") ?? "") ? Number(params.get("message")) : null;
+  const messageEpisode = episodes.find((ep) => message !== null && message >= ep.idx_first && message <= ep.idx_last);
   const targetId = /^ep-?\d+$/.test(hash) ? Number(hash.replace(/^ep-?/, "")) : null;
   const legacyStage = Number(params.get("stage") ?? hash.match(/^stage(\d+)$/)?.[1]);
-  const requestedTarget = targetId ?? segments.find((s) => s.id === legacyStage)?.ep_start ?? episodes[0].ep;
+  const requestedTarget =
+    targetId ?? messageEpisode?.ep ?? segments.find((s) => s.id === legacyStage)?.ep_start ?? episodes[0].ep;
   const initialTarget = episodes.some((ep) => ep.ep === requestedTarget) ? requestedTarget : episodes[0].ep;
   const initialIndex = Math.max(
     0,
@@ -92,9 +96,11 @@ function Timeline({ episodes, segments }: { episodes: EpisodePreview[]; segments
   const frame = useRef(0);
   const urlTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const writtenLocation = useRef("");
-  const pending = useRef<{ ep: number; fraction: number } | null>({
+  const pending = useRef<{ ep: number; fraction: number; message?: number; waitForMessage?: number } | null>({
     ep: initialTarget,
     fraction: clamp(Number(params.get("at") ?? 0) / 1000),
+    message: !params.has("at") && messageEpisode?.ep === initialTarget ? (message ?? undefined) : undefined,
+    waitForMessage: messageEpisode?.ep === initialTarget ? (message ?? undefined) : undefined,
   });
   const prependAnchor = useRef<{ height: number; top: number } | null>(null);
   const canLoadEarlier = useRef(false);
@@ -102,7 +108,7 @@ function Timeline({ episodes, segments }: { episodes: EpisodePreview[]; segments
   const visible = episodes.slice(range.start, range.end);
   const opened = new Set((params.get("open") ?? "").split(","));
   const closed = new Set((params.get("closed") ?? "").split(","));
-  const locationKey = `${hash}|${params.get("at") ?? "0"}|${params.get("stage") ?? ""}`;
+  const locationKey = `${hash}|${params.get("at") ?? "0"}|${params.get("stage") ?? ""}|${message ?? ""}`;
 
   const restore = useCallback((ep: number) => {
     const anchor = pending.current;
@@ -110,8 +116,15 @@ function Timeline({ episodes, segments }: { episodes: EpisodePreview[]; segments
     if (!root || !anchor || anchor.ep !== ep) return;
     const row = root.querySelector<HTMLElement>(`[data-episode="${ep}"]`);
     if (!row) return;
+    if (anchor.waitForMessage !== undefined && !row.querySelector(`[data-message="${anchor.waitForMessage}"]`)) return;
+    const target =
+      anchor.message === undefined ? null : row.querySelector<HTMLElement>(`[data-message="${anchor.message}"]`);
+    if (anchor.message !== undefined && !target) return;
     root.scrollTop +=
-      row.getBoundingClientRect().top - root.getBoundingClientRect().top - 24 + row.offsetHeight * anchor.fraction;
+      (target ?? row).getBoundingClientRect().top -
+      root.getBoundingClientRect().top -
+      24 +
+      (target ? 0 : row.offsetHeight * anchor.fraction);
     pending.current = null;
   }, []);
 
@@ -121,13 +134,18 @@ function Timeline({ episodes, segments }: { episodes: EpisodePreview[]; segments
     if (writtenLocation.current === locationKey) return;
     if (urlTimer.current) clearTimeout(urlTimer.current);
     const stage = Number(params.get("stage") ?? hash.match(/^stage(\d+)$/)?.[1]);
-    const id = targetId ?? segments.find((s) => s.id === stage)?.ep_start ?? episodes[0].ep;
+    const id = targetId ?? messageEpisode?.ep ?? segments.find((s) => s.id === stage)?.ep_start ?? episodes[0].ep;
     const index = episodes.findIndex((ep) => ep.ep === id);
     if (index < 0) {
       pending.current = null;
       return;
     }
-    pending.current = { ep: id, fraction: clamp(Number(params.get("at") ?? 0) / 1000) };
+    pending.current = {
+      ep: id,
+      fraction: clamp(Number(params.get("at") ?? 0) / 1000),
+      message: !params.has("at") && messageEpisode?.ep === id ? (message ?? undefined) : undefined,
+      waitForMessage: messageEpisode?.ep === id ? (message ?? undefined) : undefined,
+    };
     setActive(id);
     canLoadEarlier.current = false;
     const restoredRange = episodeWindow(params, index, episodes.length);
@@ -171,11 +189,52 @@ function Timeline({ episodes, segments }: { episodes: EpisodePreview[]; segments
     }
   }, [chapter.id, chapterOpen]);
 
+  function jumpMessage(index: number) {
+    const ep = episodes.find((ep) => index >= ep.idx_first && index <= ep.idx_last);
+    if (!ep) return;
+    if (urlTimer.current) clearTimeout(urlTimer.current);
+    writtenLocation.current = "";
+    const key = `${ep.ep}.message.${index}`;
+    const nextOpen = new Set(opened);
+    const nextClosed = new Set(closed);
+    nextOpen.delete("");
+    nextClosed.delete("");
+    nextOpen.add(key);
+    nextOpen.add(`${ep.ep}.tools`);
+    nextClosed.delete(key);
+    nextClosed.delete(`${ep.ep}.tools`);
+    update(
+      {
+        message: String(index),
+        entry: null,
+        at: null,
+        stage: null,
+        start: null,
+        limit: null,
+        timeline: null,
+        open: [...nextOpen].join(","),
+        closed: [...nextClosed].join(",") || null,
+      },
+      { hash: `ep${ep.ep}` },
+    );
+    pending.current = { ep: ep.ep, fraction: 0, message: index };
+    if (reader.current?.querySelector(`[data-message="${index}"]`)) requestAnimationFrame(() => restore(ep.ep));
+  }
   function jump(id: number) {
     if (urlTimer.current) clearTimeout(urlTimer.current);
     writtenLocation.current = "";
     update(
-      { timeline: null, at: null, stage: null, start: null, limit: null, signal: null, full: null },
+      {
+        message: null,
+        entry: null,
+        timeline: null,
+        at: null,
+        stage: null,
+        start: null,
+        limit: null,
+        signal: null,
+        full: null,
+      },
       { hash: `ep${id}` },
     );
     // Re-clicking the current stop still returns to its beginning.
@@ -219,10 +278,10 @@ function Timeline({ episodes, segments }: { episodes: EpisodePreview[]; segments
       const offset = Math.round(fraction * 1000);
       if (urlTimer.current) clearTimeout(urlTimer.current);
       urlTimer.current = setTimeout(() => {
-        writtenLocation.current = `ep${id}|${offset}|`;
+        writtenLocation.current = `ep${id}|${offset}||${message ?? ""}`;
         update(
           {
-            at: offset ? String(offset) : null,
+            at: String(offset),
             stage: null,
             start: String(range.start),
             limit: String(range.end - range.start),
@@ -258,6 +317,7 @@ function Timeline({ episodes, segments }: { episodes: EpisodePreview[]; segments
   return (
     <div className="grid gap-5 lg:grid-cols-[288px_minmax(0,1fr)] lg:gap-10">
       <aside className="min-w-0">
+        <MessageJump episodes={episodes} message={message} onJump={jumpMessage} />
         <button
           type="button"
           className={`${buttonClass} w-full justify-between lg:hidden`}
@@ -272,7 +332,7 @@ function Timeline({ episodes, segments }: { episodes: EpisodePreview[]; segments
         <nav
           ref={sidebar}
           aria-label="Episode timeline"
-          className={`${chapterOpen ? "block" : "hidden"} relative mt-3 max-h-96 overflow-y-auto overscroll-contain pr-3 lg:mt-0 lg:block lg:max-h-[calc(100dvh-285px)] lg:min-h-96 [scrollbar-gutter:stable]`}
+          className={`${chapterOpen ? "block" : "hidden"} relative mt-3 max-h-96 overflow-y-auto overscroll-contain pr-3 lg:mt-0 lg:block lg:max-h-[calc(100dvh-410px)] lg:min-h-96 [scrollbar-gutter:stable]`}
         >
           <p className="mb-4 text-[10px] font-medium uppercase tracking-[0.18em] text-muted">The investigation</p>
           {segments.map((s) => {
@@ -430,6 +490,7 @@ function Timeline({ episodes, segments }: { episodes: EpisodePreview[]; segments
             <LazyEpisode
               key={ep.ep}
               episode={ep}
+              targetMessage={messageEpisode?.ep === ep.ep ? message : null}
               root={rootElement}
               isOpen={isOpen}
               toggle={toggle}
@@ -500,6 +561,7 @@ function LoadBoundary({
 
 function LazyEpisode({
   episode: ep,
+  targetMessage,
   chapter,
   chapterStart,
   root,
@@ -508,6 +570,7 @@ function LazyEpisode({
   onReady,
 }: {
   episode: EpisodePreview;
+  targetMessage: number | null;
   chapter: Segment;
   chapterStart: boolean;
   root: HTMLElement | null;
@@ -576,7 +639,7 @@ function LazyEpisode({
               ))}
             </div>
           ) : null}
-          <EpisodeContent index={ep.ep} isOpen={isOpen} toggle={toggle} onReady={ready} />
+          <EpisodeContent index={ep.ep} targetMessage={targetMessage} isOpen={isOpen} toggle={toggle} onReady={ready} />
         </div>
       ) : (
         <svg aria-hidden="true" width="1" height={height.current} className="block" />

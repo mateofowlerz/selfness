@@ -98,6 +98,11 @@ individual disclosures, such as `open=532.message.1633,532.tools`. Messages
 start collapsed; opening a message reveals its original thinking and visible text.
 Legacy `stage` and `#stage1` links still work. The reader fetches original messages
 on demand and releases distant episode content while preserving its space.
+Episodes also accepts a message number with or without a leading `#` in its
+Go to message control. `message=1633#ep532` selects the exact message in place;
+`entry` preserves the input draft. Previous/Next follows the released message
+order and skips withheld numbers. Selected tool calls load their full source on
+demand before restoring the scroll position. Invalid input leaves the reader in place.
 Transcript uses `#m101` for the selected message, `entry` for the message-number
 input, and `release=1` for the release-notes disclosure. Legacy Episodes `q`
 parameters are cleared so the timeline always includes every episode.

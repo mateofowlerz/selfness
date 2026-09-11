@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import type { Episode } from "@/app/lib/investigation/types";
-import { LoadState, linkClass, SourceLink } from "../shared";
+import type { Episode, Message } from "@/app/lib/investigation/types";
+import { LoadState, linkClass, MessageBody, SourceLink, useDataset } from "../shared";
 
 export type DisclosureProps = {
   isOpen: (key: string, defaultOpen: boolean) => boolean;
@@ -45,10 +45,11 @@ function useEpisode(index: number) {
 
 export function EpisodeContent({
   index,
+  targetMessage,
   isOpen,
   toggle,
   onReady,
-}: { index: number; onReady: () => void } & DisclosureProps) {
+}: { index: number; targetMessage: number | null; onReady: () => void } & DisclosureProps) {
   const { data, error, retry } = useEpisode(index);
   useEffect(() => {
     if (data?.episode.ep === index) onReady();
@@ -57,7 +58,8 @@ export function EpisodeContent({
   const ep = data.episode;
   const toolsKey = `${ep.ep}.tools`;
   const artifactsKey = `${ep.ep}.artifacts`;
-  const toolsOpen = isOpen(toolsKey, false);
+  const selectedTool = ep.tools.some((tool) => tool.idx === targetMessage);
+  const toolsOpen = isOpen(toolsKey, selectedTool);
   const artifactsOpen = isOpen(artifactsKey, false);
   const artifacts = Object.entries(ep.artifacts).filter(([, items]) => items.length);
   return (
@@ -78,11 +80,16 @@ export function EpisodeContent({
           .join("\n\n");
         const visible = message.content.replace(/<thinking>[\s\S]*?<\/thinking>/g, "").trim();
         const key = `${ep.ep}.message.${message.index}`;
-        const expanded = isOpen(key, false);
+        const defaultOpen = targetMessage === message.index;
+        const expanded = isOpen(key, defaultOpen);
         const preview = visible || reasoning;
         return (
-          <div key={message.index} className="mb-5">
-            {data.messages.length > 1 ? (
+          <div
+            key={message.index}
+            data-message={message.index}
+            className={`mb-5 ${targetMessage === message.index ? "border-l-2 border-primary pl-3" : ""}`}
+          >
+            {data.messages.length > 1 || targetMessage === message.index ? (
               <p className="mb-3 text-xs text-muted">
                 {message.role} · <SourceLink index={message.index} />
               </p>
@@ -93,7 +100,7 @@ export function EpisodeContent({
               aria-controls={`ep-${key}`}
               aria-label={`${expanded ? "Hide" : "Show"} full message ${message.index}`}
               className="mb-2 inline-flex min-h-11 items-center gap-1.5 text-xs font-medium text-primary hover:text-primary-dark"
-              onClick={() => toggle(key, false)}
+              onClick={() => toggle(key, defaultOpen)}
             >
               {expanded ? "Hide full message" : "Show full message"}
               <span aria-hidden="true">{expanded ? "↑" : "→"}</span>
@@ -142,30 +149,41 @@ export function EpisodeContent({
             type="button"
             aria-expanded={toolsOpen}
             aria-controls={`ep-${toolsKey}`}
+            data-message={selectedTool && !toolsOpen ? targetMessage : undefined}
             className="min-h-11 text-xs text-muted md:min-h-8"
-            onClick={() => toggle(toolsKey, false)}
+            onClick={() => toggle(toolsKey, selectedTool)}
           >
             {toolsOpen ? "−" : "+"} {ep.tools.length} tool calls
           </button>
           {toolsOpen ? (
             <div id={`ep-${toolsKey}`} className="mt-2 space-y-4 rounded-md border border-muted/20 bg-white/40 p-3">
               {ep.tools.map((tool) => (
-                <div key={tool.idx} className="min-w-0 border-l-2 border-muted/20 pl-3">
+                <div
+                  key={tool.idx}
+                  data-message={targetMessage === tool.idx ? undefined : tool.idx}
+                  className={`min-w-0 border-l-2 pl-3 ${targetMessage === tool.idx ? "border-primary" : "border-muted/20"}`}
+                >
                   <p className="mb-2 text-xs">
                     <SourceLink index={tool.idx} /> · {tool.name}
                   </p>
-                  <pre className="whitespace-pre-wrap break-words text-xs leading-5 text-muted [overflow-wrap:anywhere]">
-                    {tool.call_preview}
-                  </pre>
-                  <pre className="mt-2 whitespace-pre-wrap break-words text-xs leading-5 [overflow-wrap:anywhere]">
-                    {tool.result_preview}
-                  </pre>
-                  <a
-                    className={`${linkClass} mt-2 inline-flex min-h-11 items-center text-xs md:min-h-8`}
-                    href={`/investigation/transcript#m${tool.idx}`}
-                  >
-                    Read full call and result →
-                  </a>
+                  {targetMessage === tool.idx ? (
+                    <SelectedTool index={tool.idx} onReady={onReady} />
+                  ) : (
+                    <>
+                      <pre className="whitespace-pre-wrap break-words text-xs leading-5 text-muted [overflow-wrap:anywhere]">
+                        {tool.call_preview}
+                      </pre>
+                      <pre className="mt-2 whitespace-pre-wrap break-words text-xs leading-5 [overflow-wrap:anywhere]">
+                        {tool.result_preview}
+                      </pre>
+                      <a
+                        className={`${linkClass} mt-2 inline-flex min-h-11 items-center text-xs md:min-h-8`}
+                        href={`/investigation/transcript#m${tool.idx}`}
+                      >
+                        Read full call and result →
+                      </a>
+                    </>
+                  )}
                 </div>
               ))}
             </div>
@@ -180,6 +198,25 @@ function MessageText({ label, text }: { label: string; text: string }) {
     <div className="mb-6">
       <p className="mb-1 text-[11px] uppercase tracking-wide text-muted">{label}</p>
       <p className="whitespace-pre-wrap break-words text-[15px] leading-7 [overflow-wrap:anywhere]">{text}</p>
+    </div>
+  );
+}
+
+function SelectedTool({ index, onReady }: { index: number; onReady: () => void }) {
+  const { data, error, retry } = useDataset<{ message: Message }>(`message?index=${index}`);
+  const ready = data?.message.index === index;
+  useEffect(() => {
+    if (ready || error) onReady();
+  }, [ready, error, onReady]);
+  if (!ready)
+    return (
+      <div data-message={error ? index : undefined}>
+        <LoadState error={error} retry={retry} />
+      </div>
+    );
+  return (
+    <div data-message={index}>
+      <MessageBody message={data.message} />
     </div>
   );
 }
