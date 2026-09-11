@@ -223,17 +223,10 @@ export default async function Writing({ params }: { params: Promise<{ slug: stri
             return <ImageLink href={`/images/${imageSlug}`} src={src} alt={alt ?? ""} />;
           },
           a: ({ href, children }) => {
-            // Preserve Notion's inline highlights without enabling raw HTML.
-            const highlightClass =
-              href === "#highlight-teal"
-                ? "bg-emerald-300 text-inherit"
-                : href === "#highlight-blue"
-                  ? "bg-sky-300 text-inherit"
-                  : href === "#highlight-orange"
-                    ? "bg-orange-100 text-inherit"
-                    : null;
-
-            if (highlightClass) return <mark className={highlightClass}>{children}</mark>;
+            // Preserve source highlight spans using the transcript's palette.
+            if (href === "#highlight-teal" || href === "#highlight-blue" || href === "#highlight-orange") {
+              return <mark className="bg-primary/15 text-fg underline decoration-primary/40">{children}</mark>;
+            }
 
             return (
               <a href={href} className="text-primary underline hover:text-primary-dark">
