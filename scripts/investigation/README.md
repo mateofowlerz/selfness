@@ -42,12 +42,15 @@ messages 1–81 or material after 2145.
 From `site`, run `pnpm install --frozen-lockfile` if dependencies are missing, then
 `pnpm dev --hostname 127.0.0.1 --port 3047`.
 
-Semantic search requires `OPENAI_API_KEY` in the server environment (or untracked
-`site/.env.local`). Never use a `NEXT_PUBLIC_` variable for it. The code sends only
+Semantic search requires `INVESTIGATION_OPENAI_API_KEY` in the server environment
+or untracked `site/.env.local`. It takes precedence over a shared shell's
+`OPENAI_API_KEY`, which remains supported as a fallback. Never use a `NEXT_PUBLIC_`
+variable for either key. The code sends only
 the visitor's query to OpenAI's embeddings endpoint, with the existing model
-`text-embedding-3-large`, and ranks against the copied cache. The source-passage buttons rank against the
-normalized mean of that message’s cached content vectors, so they need neither an
-API key nor a network request. They do not pretend to embed a new free-text query. No transcript rebuild
+`text-embedding-3-large`, and ranks against the copied cache. The text input searches
+after typing pauses and always displays ten passages. The API also supports source-message
+queries using the normalized mean of that message’s cached content vectors; these need neither an
+API key nor an external request. No transcript rebuild
 or paid model analysis is required. Official API schema:
 https://developers.openai.com/api/reference/resources/embeddings/methods/create
 
@@ -77,9 +80,8 @@ pnpm exec tsc --noEmit
 pnpm build
 ```
 
-During local verification the configured key returned `429 / insufficient_quota /
-credit_balance_exhausted`. Billing was not modified. Cached passage similarity
-works; new text-query embeddings need a funded key before they can succeed.
+The provider must have available credit for new text-query embeddings. Cached
+source-message similarity remains available without credentials.
 
 The verifier compares every released message and generated artifact checksum,
 72 ranking combinations against the original Python implementation, five complete
@@ -87,8 +89,14 @@ top-50 cosine rankings against NumPy, AND/empty-tag behavior, and invalid vector
 The copied Python files under `source/` are provenance references; some retain
 their original CLI paths and should be used with explicit input paths.
 
-Browser QA should cover combined tags, empty results, scope changes, message and
-episode hashes, stage filtering, expanded tools, a real semantic query, and narrow
+The search tools persist state in the URL. Tag search uses `q`, `groups`, `limit`,
+`definitions`, and `#m139` for an open message. Semantic search uses `q`. Episodes
+uses `q`, `stage`, `signal=1`, `full=1`, `limit`, and `#ep2` for selection. Its
+`open` and `closed` parameters preserve individual disclosures, such as
+`open=2.tools,2.artifacts&closed=2.thinking`. Legacy `#stage1` links still work.
+
+Browser QA should cover combined tags, empty results, message and
+episode hashes, stage filtering, expanded text/tools/artifacts, a real semantic query, and narrow
 mobile layouts. Keep the writing synchronized with the latest Notion snapshot
 before committing; Notion is not edited by the import.
 

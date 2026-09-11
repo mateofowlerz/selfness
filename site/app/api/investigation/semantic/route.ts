@@ -42,7 +42,8 @@ export async function POST(request: Request) {
   const cacheKey = fromMessage ? `message:${body.message}` : `query:${query}`;
   const k = body.k === undefined ? 10 : Number(body.k);
   if (!Number.isInteger(k) || k < 1 || k > 50) return reply("Choose between 1 and 50 results.", 400);
-  const key = process.env.OPENAI_API_KEY;
+  // A project-specific key takes precedence over shared shell credentials.
+  const key = process.env.INVESTIGATION_OPENAI_API_KEY || process.env.OPENAI_API_KEY;
   if (!fromMessage && !key)
     return reply("Semantic search is temporarily unavailable. You can still explore the transcript with tags.", 503);
   const cached = cache.get(cacheKey);

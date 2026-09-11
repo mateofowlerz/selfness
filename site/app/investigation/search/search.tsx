@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useRef } from "react";
 import { rankSignals } from "@/app/lib/investigation/search";
-import type { Scope, SearchData } from "@/app/lib/investigation/types";
+import type { SearchData } from "@/app/lib/investigation/types";
 import { buttonClass, inputClass, LoadState, MessageDetail, useDataset } from "../shared";
 import { TagChip, tagChipClass, tagLabel } from "../tag-chip";
 import { useSearchUrl } from "../use-search-url";
@@ -22,8 +22,7 @@ function SearchArchive({ data }: { data: SearchData }) {
   const selected = params.has("groups")
     ? names.filter((name) => (params.get("groups") ?? "").split(",").includes(name))
     : names;
-  const scope: Scope =
-    params.get("scope") === "thinking" ? "thinking" : params.get("scope") === "visible" ? "visible" : "both";
+  const scope = "both";
   const query = params.get("q") ?? "";
   const requestedLimit = Number(params.get("limit"));
   const limit =
@@ -42,14 +41,14 @@ function SearchArchive({ data }: { data: SearchData }) {
         const needle = query.trim().replace(/^#/, "").toLowerCase();
         return !needle || `${r.index} ${r.excerpt} ${r.summary} ${r.groups.join(" ")}`.toLowerCase().includes(needle);
       }),
-    [data, scope, selectionKey, query],
+    [data, selectionKey, query],
   );
   const currentIsVisible = ranked.slice(0, limit).some((r) => r.index === current);
   useEffect(() => {
     if (current !== null) currentRef.current?.scrollIntoView({ block: "nearest" });
   }, [current]);
   function filter(values: Record<string, string | null>, replace = false) {
-    update({ ...values, limit: null, match: null }, { replace, hash: "" });
+    update({ ...values, limit: null, match: null, scope: null }, { replace, hash: "" });
     resultList.current?.scrollTo({ top: 0 });
   }
   function reset() {
@@ -89,18 +88,6 @@ function SearchArchive({ data }: { data: SearchData }) {
             onChange={(e) => filter({ q: e.target.value || null }, true)}
           />
         </label>
-        <label className="mt-4 block text-xs font-medium">
-          Reasoning scope
-          <select
-            className={`${inputClass} mt-2`}
-            value={scope}
-            onChange={(e) => filter({ scope: e.target.value === "both" ? null : e.target.value })}
-          >
-            <option value="both">Thinking + visible text</option>
-            <option value="thinking">Thinking only</option>
-            <option value="visible">Visible text only</option>
-          </select>
-        </label>
         <fieldset className="mt-5">
           <legend className="text-xs font-medium">
             Tags{" "}
@@ -108,8 +95,7 @@ function SearchArchive({ data }: { data: SearchData }) {
               {selected.length}/{names.length}
             </span>
           </legend>
-          <p className="mt-1 mb-3 text-xs text-muted">Matches any selected tag.</p>
-          <div className="flex flex-wrap gap-2">
+          <div className="mt-3 flex flex-wrap gap-2">
             {names.map((name) => {
               const active = selected.includes(name);
               return (
@@ -200,7 +186,7 @@ function SearchArchive({ data }: { data: SearchData }) {
               <p className="mt-1 text-xs text-muted">
                 {!selected.length
                   ? "Select all to browse every tagged message."
-                  : "Try another phrase, more tags, or a broader reasoning scope."}
+                  : "Try another phrase or select more tags."}
               </p>
             </div>
           ) : null}
