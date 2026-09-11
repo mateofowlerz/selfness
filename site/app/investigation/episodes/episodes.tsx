@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { EpisodePreview, Segment } from "@/app/lib/investigation/types";
-import { buttonClass, inputClass, LoadState, linkClass, useDataset } from "../shared";
+import { buttonClass, LoadState, linkClass, useDataset } from "../shared";
 import { TagChip } from "../tag-chip";
 import { useSearchUrl } from "../use-search-url";
 import { type DisclosureProps, EpisodeContent } from "./episode-content";
@@ -29,45 +29,22 @@ const chapterFor = (ep: number, segments: Segment[]) =>
 
 export default function Episodes() {
   const { params, update } = useSearchUrl();
-  const query = params.get("q") ?? "";
+  useEffect(() => {
+    if (params.has("q")) update({ q: null, start: null, limit: null }, { replace: true });
+  }, [params, update]);
   const segments = useDataset<{ segments: Segment[] }>("segments");
-  const previews = useDataset<{ episodes: EpisodePreview[]; query: string }>(
-    `episode-previews?${new URLSearchParams({ q: query })}`,
-  );
-  const ready = previews.data?.query === query;
+  const previews = useDataset<{ episodes: EpisodePreview[] }>("episode-previews");
   return (
     <div data-search-workspace>
-      <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="mb-1! text-2xl!">A story in ten stages.</h1>
-          <p className="text-sm text-muted">Follow the messages. See how one step leads to the next.</p>
-        </div>
-        <label className="w-full sm:w-64">
-          <span className="sr-only">Search episodes</span>
-          <input
-            className={`${inputClass} sm:text-sm`}
-            type="search"
-            placeholder="Find a moment…"
-            value={query}
-            onChange={(e) =>
-              update(
-                { q: e.target.value || null, stage: null, start: null, limit: null, at: null },
-                { replace: true, hash: "" },
-              )
-            }
-          />
-        </label>
+      <div className="mb-5">
+        <h1 className="mb-1! text-2xl!">A story in ten stages.</h1>
+        <p className="text-sm text-muted">Follow the messages. See how one step leads to the next.</p>
       </div>
-      {ready && previews.data && segments.data ? (
+      {previews.data && segments.data ? (
         previews.data.episodes.length ? (
-          <Timeline key={query} episodes={previews.data.episodes} segments={segments.data.segments} />
+          <Timeline episodes={previews.data.episodes} segments={segments.data.segments} />
         ) : (
-          <div className="py-20 text-sm text-muted">
-            No episodes match this phrase.{" "}
-            <button type="button" className={linkClass} onClick={() => update({ q: null })}>
-              Clear search
-            </button>
-          </div>
+          <p className="py-10 text-sm text-muted">No episodes are available.</p>
         )
       ) : (
         <LoadState
