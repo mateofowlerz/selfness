@@ -37,8 +37,16 @@ export default function Episodes() {
   return (
     <div data-search-workspace>
       <div className="mb-5">
-        <h1 className="mb-1! text-2xl!">A story in ten stages.</h1>
-        <p className="text-sm text-muted">Follow the messages. See how one step leads to the next.</p>
+        <h1 className="mb-1! text-2xl!">Timeline of Mythos adventure through the internet</h1>
+        <p className="text-sm text-muted">
+          Based on{" "}
+          <a
+            href="https://www.anthropic.com/research/alignment-assessment-cybersecurity-incidents"
+            className={linkClass}
+          >
+            Anthropic&apos;s cybersecurity investigation transcripts
+          </a>
+        </p>
       </div>
       {previews.data && segments.data ? (
         previews.data.episodes.length ? (
