@@ -1,0 +1,6 @@
+# Preserve checksum-verified archive bytes on every platform.
+site/data/investigation/** -text
+site/public/investigation/source/** -text
+site/data/investigation/vectors.f32 binary
+# The upstream release notice uses Markdown's two-space hard line breaks.
+site/public/investigation/source/README.md whitespace=-blank-at-eol

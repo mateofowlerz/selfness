@@ -1,0 +1,41 @@
+{
+  "retrieved_at_utc": "2026-09-10T13:00:54.324423+00:00",
+  "article_url": "https://www.anthropic.com/research/alignment-assessment-cybersecurity-incidents",
+  "repository_url": "https://github.com/anthropics/mythos-5-incident-transcript",
+  "commit": "62858fcf2725fe7b38872d538e973f38846ea744",
+  "tree_api_url": "https://api.github.com/repos/anthropics/mythos-5-incident-transcript/git/trees/62858fcf2725fe7b38872d538e973f38846ea744?recursive=1",
+  "files": [
+    {
+      "path": "README.md",
+      "url": "https://raw.githubusercontent.com/anthropics/mythos-5-incident-transcript/62858fcf2725fe7b38872d538e973f38846ea744/README.md",
+      "bytes": 2506,
+      "git_blob_sha1": "f9ee2075d8f2101855025da6294fbb1d2bafe86b",
+      "sha256": "5a5368109ea078b115551964cab65ec7070441cb6934bada18f5a1680db65050"
+    },
+    {
+      "path": "transcript.html",
+      "url": "https://raw.githubusercontent.com/anthropics/mythos-5-incident-transcript/62858fcf2725fe7b38872d538e973f38846ea744/transcript.html",
+      "bytes": 3324138,
+      "git_blob_sha1": "a84fe85c0017312436afcdf8b20819543654326a",
+      "sha256": "b927f90b4e4194f7817c11d72687cc7d3de6b00241513264e9e6c238813443b6"
+    },
+    {
+      "path": "transcript.jsonl",
+      "url": "https://raw.githubusercontent.com/anthropics/mythos-5-incident-transcript/62858fcf2725fe7b38872d538e973f38846ea744/transcript.jsonl",
+      "bytes": 2621187,
+      "git_blob_sha1": "488d11d83def14275c364566a1016d22dcc89157",
+      "sha256": "6f2a5a50b53640bd779a198cef8a620f2d6e2bbaaf4a0dea9edac87a69fc3e4b"
+    },
+    {
+      "path": "transcript.pdf",
+      "url": "https://raw.githubusercontent.com/anthropics/mythos-5-incident-transcript/62858fcf2725fe7b38872d538e973f38846ea744/transcript.pdf",
+      "bytes": 35457556,
+      "git_blob_sha1": "278ad190cb7f0b1493689981d96e52f0fc35d21b",
+      "sha256": "9f285c7332f6c893d06bb6d4baad906be7e342e381933c02493b12a894d3ab75"
+    }
+  ],
+  "validation": {
+    "git_blob_hashes_match": true,
+    "jsonl_records": 2065
+  }
+}

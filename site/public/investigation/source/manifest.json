@@ -1,0 +1,27 @@
+{
+  "inputs": {
+    "transcript.jsonl": "6f2a5a50b53640bd779a198cef8a620f2d6e2bbaaf4a0dea9edac87a69fc3e4b",
+    "README.md": "5a5368109ea078b115551964cab65ec7070441cb6934bada18f5a1680db65050",
+    "SOURCE.json": "7a205bc063455f1f7dd223a2b129b3f520b475ebe688251592d8e0dc1827b80b",
+    "SHA256SUMS": "fa1d69edbaa1dabe0331e59f3482a82bfd062f3e9d7251eed7a1c02befaefd1c",
+    "misalignment_patterns.json": "89979ce5d8d8a23a5962abf896098ffdcb8c1aede3e327e2295551df80cbdbce",
+    "summaries.json": "ce3350dddef9fa4d85c61ac8d5be15882e5f9b318c83f9ed2352a029ef1c42f1",
+    "self-deception-scores.json": "26b4298910c082993303056d7859a454fef9682ff40853b1bed2f392df6d12ac",
+    "episodes.json": "c32518f894f37006d352f3b90046d69598747546a8933d84b9a862a8c813d669",
+    "segments.json": "4c100a9795fe085ca02b2a7b98f42df19c2067a303f02cfc3c4694f3b23f5c55",
+    "transcript_semantic_index.npz": "60102f1e6a0ce664e02cae5f217192ec9cb99dac4e3cb2413732228c507440ca"
+  },
+  "source_sha256": "6f2a5a50b53640bd779a198cef8a620f2d6e2bbaaf4a0dea9edac87a69fc3e4b",
+  "messages": 2064,
+  "chunks": 3839,
+  "dimensions": 3072,
+  "model": "text-embedding-3-large",
+  "outputs": {
+    "episodes.json": "aebdc76cff8a06004dbdc7c5f318123bc53ec5429e84211361a0845e9372db51",
+    "messages.json": "2c4b044070a80d3ec83fd9dc37d819db3285928ddd40e38231036345bb206ee8",
+    "search.json": "80b4a9af672e3c4ba813d417673a9302d658f25a7d213cbc398fd36462c68d1a",
+    "segments.json": "a5c6f6dfea6db78d265c3fc0abbc726feb3a71493f9b42aae729ced735b60f27",
+    "semantic.json": "7cf0c45793ba57dcb0226f4d1e9b5b568b8c359f5d70e920b5a8637e571e317d",
+    "vectors.f32": "964a32af2dcd7e0edeea1055433c883d4350f6965891559aa01357a2110f84b4"
+  }
+}
