@@ -19,6 +19,7 @@
 
 # production
 /build
+/public/private-post.css
 
 # misc
 .DS_Store
