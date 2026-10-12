@@ -21,7 +21,12 @@ export default function HeaderMark() {
               src: "/marks/anthropic-skull-parcel.png",
               alt: "A black parcel with a skull seal and a red ribbon shaped like a forked tongue",
             }
-          : null;
+          : pathname === "/predictions-for-safety"
+            ? {
+                src: "/marks/predictions-crystal-ball-cutout.png",
+                alt: "A black cut-paper crystal ball with a crimson star, suggesting a glimpse of the future",
+              }
+            : null;
 
   if (!mark) return null;
 

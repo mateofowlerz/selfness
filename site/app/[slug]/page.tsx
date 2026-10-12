@@ -81,7 +81,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         : undefined;
 
   return {
-    title: `${writing.title} — Mateo Fowler`,
+    title: writing.title,
     description: writing.description,
     alternates: { canonical: `/${slug}` },
     openGraph: {
@@ -269,9 +269,9 @@ export default async function Writing({ params }: { params: Promise<{ slug: stri
         <InlineEditor key={slug} slug={slug} source={stripFrontmatter(writing.content)} />
       )}
       {notes.size > 0 ? (
-        <ol className="mt-12 list-decimal border-t border-muted/10 pt-6 pl-5 text-sm text-(--muted) xl:hidden">
+        <ol className="mt-12 list-decimal border-t border-muted/10 pt-6 pl-5 text-sm text-(--muted)">
           {[...notes].map(([id, text]) => (
-            <li key={id} id={`fn-${id}`} className="mb-2">
+            <li key={id} id={`fn-${id}`} className="mb-2 scroll-mt-8">
               <NoteBody text={text} />
             </li>
           ))}

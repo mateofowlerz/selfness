@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 const LABEL_MAP: Record<string, string> = {
   wishlist: "Wishlist",
   "about-startups": "Repeated startup advice",
+  "predictions-for-safety": "AI Safety Predictions",
   admin: "Admin",
   images: "Images",
   cv: "CV",

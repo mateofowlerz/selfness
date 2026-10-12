@@ -31,7 +31,9 @@ export default async function BlogImage({ params }: { params: Promise<{ slug: st
     ? "startups-vs-labs-star.png"
     : isInvestigation
       ? "anthropic-skull-parcel.png"
-      : null;
+      : slug === "predictions-for-safety"
+        ? "predictions-crystal-ball-cutout.png"
+        : null;
   const essayMark = markFile
     ? `data:image/png;base64,${(await readFile(join(process.cwd(), "public/marks", markFile))).toString("base64")}`
     : null;
