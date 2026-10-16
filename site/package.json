@@ -4,14 +4,16 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/build-private-styles.mjs && next build",
+    "build": "node scripts/build-private-styles.mjs && node scripts/eag/build-styles.mjs && next build",
     "start": "next start",
     "lint": "biome check",
     "lint:fix": "biome check --write",
-    "format": "biome format --write"
+    "format": "biome format --write",
+    "dev:eag": "node scripts/eag/build-styles.mjs && next dev -p 8766"
   },
   "dependencies": {
     "@next/third-parties": "^16.2.4",
+    "@vercel/blob": "2.8.0",
     "framer-motion": "^12.23.26",
     "next": "16.2.4",
     "react": "19.2.3",
@@ -29,5 +31,10 @@
     "tailwindcss": "^4",
     "typescript": "^5"
   },
-  "packageManager": "pnpm@10.28.2+sha512.41872f037ad22f7348e3b1debbaf7e867cfd448f2726d9cf74c08f19507c31d2c8e7a11525b983febc2df640b5438dee6023ebb1f84ed43cc2d654d2bc326264"
+  "packageManager": "pnpm@10.28.2+sha512.41872f037ad22f7348e3b1debbaf7e867cfd448f2726d9cf74c08f19507c31d2c8e7a11525b983febc2df640b5438dee6023ebb1f84ed43cc2d654d2bc326264",
+  "pnpm": {
+    "overrides": {
+      "xdg-app-paths": "5.1.0"
+    }
+  }
 }

@@ -40,3 +40,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+/public/eag/styles.css
+/eag-dev-notes.json
+/.eag-secrets.local.json
+/eag-dev-notes.json.*.tmp
+/.eag-local/
