@@ -4,7 +4,11 @@ import tailwind from "@tailwindcss/postcss";
 const require = createRequire(import.meta.url);
 const postcss = createRequire(require.resolve("@tailwindcss/postcss"))("postcss");
 const result = await postcss([tailwind()]).process(
-  '@import "tailwindcss"; @source "../../app/eag"; @source "../../public/eag";',
+  `@import "tailwindcss";
+  @import "../../app/theme.css";
+  @theme { --font-sans: "Public Sans", system-ui, sans-serif; }
+  @source "../../app/eag";
+  @source "../../public/eag";`,
   { from: new URL("entry.css", import.meta.url).pathname },
 );
 await fs.mkdir(new URL("../../public/eag", import.meta.url), { recursive: true });

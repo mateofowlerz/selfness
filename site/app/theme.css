@@ -1,0 +1,24 @@
+@theme {
+  --color-primary: #d42a60;
+  --color-primary-dark: #a82250;
+  --color-primary-darker: #7d1a3c;
+  --color-muted: #6b6b6b;
+  --color-bg: #faf9f7;
+  --color-fg: #1a1a1a;
+}
+
+@font-face {
+  font-family: "Public Sans";
+  src: url("/fonts/PublicSans[wght].ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Public Sans";
+  src: url("/fonts/PublicSans-Italic[wght].ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
