@@ -4,9 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-overrides:
-  xdg-app-paths: 5.1.0
-
 importers:
 
   .:

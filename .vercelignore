@@ -1,3 +1,4 @@
+.env*
 site/.env*
 site/.eag-secrets.local.json
 site/eag-dev-notes.json*

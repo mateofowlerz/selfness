@@ -20,17 +20,17 @@ Production notes use a **private Vercel Blob store**, with uncached reads and ET
 
 Browser QA also covers editing, reload, switching participants, a simulated sync outage and recovery, and the mobile layout.
 
-## Pending deployment
+## Deployment
 
-Deployment was deferred at the user's request while the Mac had no IPv4 route. Nothing in this branch has been pushed or published to mateofowler.com.
+The Vercel project is `selfness` in scope `mateo-sirvanacoms-projects`, with root directory `site`. The dedicated Blob store is `selfness-eag-notes` (`store_SUUYa67cNrMUDdmo`, private, `iad1`), connected to production only. The three EAG secrets are also scoped to production only. Keep deployment status separate from configuration: verify the custom domain after each release.
 
-When deployment is resumed:
+For subsequent deployments:
 
 1. Fetch current `origin/master` and reconcile any newer Selfness changes.
 2. Inspect the existing Vercel project `selfness` in scope `mateo-sirvanacoms-projects` and its storage/environment names. Preserve the public site's settings and existing private writing.
-3. Create/connect a dedicated **private** Blob store for EAG notes. Use production only; do not point local QA at live notes. Prefer Vercel OIDC when available; otherwise the server SDK reads `BLOB_READ_WRITE_TOKEN`.
+3. Reuse the dedicated **private** Blob store for EAG notes. Use production only; do not point local QA at live notes. The project connection supplies `BLOB_READ_WRITE_TOKEN`; OIDC can replace it after configuring and validating the store's production trust policy.
 4. Set production `EAG_ACCESS_KEY_SHA256`, `EAG_SESSION_SECRET`, and `EAG_DATA_KEY` from the local secret material through stdin, never CLI arguments or logs. Do not set `EAG_LOCAL_NOTES` in production.
 5. Build, run the isolated tests, scan source/public bundles for plaintext/secrets, and publish the reviewed commit using the existing Selfness deployment flow.
 6. Verify `/eag` remains locked without the private link, authenticate normally, test real Blob persistence across independent sessions, and migrate existing browser notes. Deliver the private unlock link securely to the user. The plain `/eag` URL works after unlocking on that device.
 
-Current implementation pins `xdg-app-paths` to cached version 5.1.0 because dependency installation was offline. Remove that temporary override and resolve the normal dependency tree once network access returns, then rebuild.
+The temporary offline `xdg-app-paths` override has been removed, and the normal lockfile resolution is restored.
