@@ -1,7 +1,13 @@
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { createHash, randomUUID } from "node:crypto";
+const blobTests = spawnSync(
+  process.execPath,
+  ["--experimental-transform-types", "--experimental-test-module-mocks", "--test", "scripts/eag/test-blob-notes.mjs"],
+  { stdio: "inherit" },
+);
+if (blobTests.status !== 0) process.exit(blobTests.status || 1);
 const config = JSON.parse(await fs.readFile(".eag-secrets.local.json", "utf8"));
 const testName = `test-${randomUUID()}.json`;
 const temporary = path.join(process.cwd(), ".eag-local", testName);

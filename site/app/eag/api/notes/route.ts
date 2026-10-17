@@ -7,7 +7,8 @@ export async function GET(request: Request) {
   if (!authenticated(request)) return json({ error: "Unlock required" }, 401);
   try {
     return json({ notes: await readNotes() });
-  } catch {
+  } catch (error) {
+    console.error("EAG notes read failed", { errorType: error instanceof Error ? error.constructor.name : "Unknown" });
     return json({ error: "Sync is unavailable. Your local notes are safe." }, 503);
   }
 }
@@ -27,6 +28,7 @@ export async function PUT(request: Request) {
     return json({ note: await saveNote(slug as string, value, baseVersion as string | null) });
   } catch (error) {
     if (error instanceof NoteConflict) return json({ error: error.message, current: error.current }, 409);
+    console.error("EAG notes save failed", { errorType: error instanceof Error ? error.constructor.name : "Unknown" });
     return json({ error: "Could not sync this note. Your local copy is kept." }, 503);
   }
 }

@@ -22,7 +22,13 @@ async function load(): Promise<{ notes: Notes; etag: string | null }> {
       throw error;
     }
   }
-  const result = await get(pathname, { access: "private", useCache: false });
+  const result = await get(pathname, {
+    access: "private",
+    useCache: false,
+    // Compressed responses carry a weak ETag (W/...), which Blob rejects for
+    // ifMatch writes. Read the original representation to retain its strong ETag.
+    headers: { "Accept-Encoding": "identity" },
+  });
   if (!result) return { notes: {}, etag: null };
   if (result.statusCode !== 200 || !result.stream) throw new Error("Unable to read current notes");
   return { notes: await new Response(result.stream).json(), etag: result.blob.etag };
@@ -67,6 +73,7 @@ async function update(slug: string, value: string, baseVersion: string | null): 
       throw error;
     }
   }
+  console.error("EAG notes write retries exhausted", { attempts: 4 });
   throw new Error("Notes are busy. Try again shortly.");
 }
 export async function saveNote(slug: string, value: string, baseVersion: string | null) {

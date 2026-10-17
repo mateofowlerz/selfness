@@ -6,6 +6,8 @@ All 29 briefs and schedule details are stored in an AES-256-GCM envelope in `dat
 
 Production notes use a **private Vercel Blob store**, with uncached reads and ETag conditional writes. Note versions reject stale edits from other devices; the interface preserves both versions for an explicit choice. A local draft is saved as you type. Failed saves retry, and drafts recover after reload. Cleared notes keep a version so a stale device cannot resurrect them silently. The UI refreshes from other devices every 15 seconds and on focus/reconnection.
 
+Blob reads request `Accept-Encoding: identity` to retain the strong ETag needed by conditional writes. Compressed responses can carry weak ETags, which cause every `ifMatch` write to fail. Keep the conditional write check; removing it would allow concurrent notes to overwrite each other. Runtime diagnostics log only operation/error types, never note contents or credentials.
+
 ## Local preview
 
 - Run `pnpm run dev:eag` in `site/`; it serves `http://localhost:8766/eag`.
@@ -19,6 +21,8 @@ Production notes use a **private Vercel Blob store**, with uncached reads and ET
 `pnpm build` compiles both the public site and the private routes. `node scripts/eag/run-tests.mjs` starts its own production-mode test server on port 8768 and uses a disposable notes file. It checks authentication, cross-origin rejection, private responses, two independent sessions, note isolation, stale-write conflicts, and payload validation. It leaves user notes unchanged. `node scripts/eag/check-privacy.mjs` checks source, route traces and public assets for private notes, participant names, meeting IDs and generated secrets.
 
 Browser QA also covers editing, reload, switching participants, a simulated sync outage and recovery, and the mobile layout.
+
+`run-tests.mjs` also exercises the production Blob path with a storage mock that reproduces compressed weak ETags. It checks concurrent participant merges, stale-edit rejection, and idempotent retries without accessing live notes. Run those tests alone with `node --experimental-transform-types --experimental-test-module-mocks --test scripts/eag/test-blob-notes.mjs`.
 
 ## Deployment
 
