@@ -3,10 +3,10 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["127.0.0.1"],
   outputFileTracingExcludes: {
-    "/eag/api/*": ["./eag-dev-notes.json*", "./.eag-local/**", "./.eag-secrets.local.json", "./.env*"],
+    "/private/eag/api/*": ["./eag-dev-notes.json*", "./.eag-local/**", "./.eag-secrets.local.json", "./.env*"],
   },
   outputFileTracingIncludes: {
-    "/eag/api/*": ["./data/eag/guide.enc.json"],
+    "/private/eag/api/*": ["./data/eag/guide.enc.json"],
     "/api/investigation/*": ["./data/investigation/*.json"],
     "/api/investigation/semantic": ["./data/investigation/semantic.json", "./data/investigation/vectors.f32"],
   },

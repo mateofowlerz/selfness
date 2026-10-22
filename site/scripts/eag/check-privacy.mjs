@@ -25,8 +25,8 @@ const source = execFileSync("git", [
   "--others",
   "--exclude-standard",
   "-z",
-  "app/eag",
-  "public/eag",
+  "app/private/eag",
+  "public/private/eag",
   "scripts/eag",
   "data/eag",
 ])

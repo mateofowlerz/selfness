@@ -151,7 +151,7 @@ function startGuide(guideData) {
     updateNoteUI();
     const work = (async () => {
       try {
-        const response = await fetch("/eag/api/notes", {
+        const response = await fetch("/private/eag/api/notes", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ slug, value: sentValue, baseVersion: note.baseVersion }),
@@ -187,7 +187,7 @@ function startGuide(guideData) {
     if (refreshing || document.hidden || pendingSaves.size) return;
     refreshing = true;
     try {
-      const response = await fetch("/eag/api/notes", { cache: "no-store", signal: AbortSignal.timeout(15000) });
+      const response = await fetch("/private/eag/api/notes", { cache: "no-store", signal: AbortSignal.timeout(15000) });
       if (!response.ok) throw new Error("Sync unavailable");
       const payload = await response.json();
       remoteReady = true;
@@ -403,7 +403,7 @@ function startGuide(guideData) {
   });
   document.querySelector("#lock-guide").addEventListener("click", async () => {
     await Promise.allSettled(meetings.filter((m) => readNote(m).dirty).map(savePerson));
-    await fetch("/eag/api/session", { method: "DELETE" });
+    await fetch("/private/eag/api/session", { method: "DELETE" });
     location.reload();
   });
   window.addEventListener("online", refreshNotes);
@@ -430,7 +430,7 @@ async function unlockGuide(value) {
   } catch {}
   const status = document.querySelector("#unlock-status");
   status.textContent = "Unlocking…";
-  const response = await fetch("/eag/api/session", {
+  const response = await fetch("/private/eag/api/session", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ key }),
@@ -444,7 +444,7 @@ async function unlockGuide(value) {
 }
 async function loadGuide() {
   try {
-    const response = await fetch("/eag/api/data", { cache: "no-store" });
+    const response = await fetch("/private/eag/api/data", { cache: "no-store" });
     if (!response.ok) {
       document.querySelector("#unlock-status").textContent =
         response.status === 401 ? "" : "The guide is temporarily unavailable. Please retry.";

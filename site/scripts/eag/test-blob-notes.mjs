@@ -32,7 +32,7 @@ mock.module("@vercel/blob", {
     },
   },
 });
-const { saveNote, NoteConflict } = await import("../../app/eag/lib/notes.ts");
+const { saveNote, NoteConflict } = await import("../../app/private/eag/lib/notes.ts");
 const initial = { value: "Existing note", version: "original-version", updatedAt: "2026-10-17T12:00:00Z" };
 beforeEach(() => {
   stored = { "person-a": { ...initial } };

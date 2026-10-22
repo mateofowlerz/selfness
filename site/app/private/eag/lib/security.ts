@@ -32,10 +32,10 @@ function signature(payload: string) {
 }
 export function sessionCookie() {
   const expires = String(Math.floor(Date.now() / 1000) + lifetime);
-  return `${cookieName}=${expires}.${signature(expires)}; HttpOnly; Path=/eag; SameSite=Strict; Max-Age=${lifetime}${process.env.NODE_ENV === "production" ? "; Secure" : ""}`;
+  return `${cookieName}=${expires}.${signature(expires)}; HttpOnly; Path=/private/eag; SameSite=Strict; Max-Age=${lifetime}${process.env.NODE_ENV === "production" ? "; Secure" : ""}`;
 }
 export function clearSessionCookie() {
-  return `${cookieName}=; HttpOnly; Path=/eag; SameSite=Strict; Max-Age=0${process.env.NODE_ENV === "production" ? "; Secure" : ""}`;
+  return `${cookieName}=; HttpOnly; Path=/private/eag; SameSite=Strict; Max-Age=0${process.env.NODE_ENV === "production" ? "; Secure" : ""}`;
 }
 export function authenticated(request: Request) {
   try {

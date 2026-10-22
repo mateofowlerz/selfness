@@ -38,7 +38,7 @@ try {
   let ready = false;
   for (let i = 0; i < 80; i++) {
     try {
-      if ((await fetch(base + "/eag")).ok) {
+      if ((await fetch(base + "/private/eag")).ok) {
         ready = true;
         break;
       }

@@ -7,9 +7,9 @@ const result = await postcss([tailwind()]).process(
   `@import "tailwindcss";
   @import "../../app/theme.css";
   @theme { --font-sans: "Public Sans", system-ui, sans-serif; }
-  @source "../../app/eag";
-  @source "../../public/eag";`,
+  @source "../../app/private/eag";
+  @source "../../public/private/eag";`,
   { from: new URL("entry.css", import.meta.url).pathname },
 );
-await fs.mkdir(new URL("../../public/eag", import.meta.url), { recursive: true });
-await fs.writeFile(new URL("../../public/eag/styles.css", import.meta.url), result.css);
+await fs.mkdir(new URL("../../public/private/eag", import.meta.url), { recursive: true });
+await fs.writeFile(new URL("../../public/private/eag/styles.css", import.meta.url), result.css);

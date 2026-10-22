@@ -7,6 +7,7 @@ const LABEL_MAP: Record<string, string> = {
   wishlist: "Wishlist",
   "about-startups": "Repeated startup advice",
   "predictions-for-safety": "AI Safety Predictions",
+  eag: "My first EAG",
   admin: "Admin",
   images: "Images",
   cv: "CV",
