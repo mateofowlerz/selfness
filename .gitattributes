@@ -4,3 +4,6 @@ site/public/investigation/source/** -text
 site/data/investigation/vectors.f32 binary
 # The upstream release notice uses Markdown's two-space hard line breaks.
 site/public/investigation/source/README.md whitespace=-blank-at-eol
+# Unlisted static videos. Plain git blobs: each file is under GitHub's 100MB limit.
+# Do not convert these to Git LFS. Vercel deploys LFS pointer files unless Git LFS is enabled.
+site/public/swan/*.mp4 binary
